@@ -1,6 +1,6 @@
 # Roadmap: mods we want to merge
 
-Already in the catalog: [`fence`](../mods/fence/), [`circuit-breaker`](../mods/circuit-breaker/), [`ding`](../mods/ding/), [`show-paths`](../mods/show-paths/), [`copy-last`](../mods/copy-last/).
+Already in the catalog: [`fence`](../mods/fence/), [`circuit-breaker`](../mods/circuit-breaker/), [`ding`](../mods/ding/), [`show-paths`](../mods/show-paths/), [`copy-last`](../mods/copy-last/), [`right-tool`](../mods/right-tool/), [`undo-agent`](../mods/undo-agent/).
 
 Every entry below starts from a problem developers have on record, names the closest mod that already exists so you can check it isn't enough, and says which events and `$` calls make it work. The list is ordered smallest first, because a one-hook fix for a 186-reaction annoyance is worth more than a framework. The [ecosystem survey](ecosystem.md) explains what we deliberately don't build.
 
@@ -8,31 +8,7 @@ Every entry below starts from a problem developers have on record, names the clo
 
 Claim one by opening a **Mod idea** issue that links here.
 
-## 1. `right-tool` — stop Bash doing Read's job
-
-**Pain.** Claude runs `cat file`, `grep -r`, `find . -name`, and `sed -n 10,20p` in Bash when Read, Grep, and Glob exist. Each costs a permission prompt and dumps raw output into context. [#19649](https://github.com/anthropics/claude-code/issues/19649), 120 reactions.
-
-**What it does.** A `tool.call` hook on Bash recognizes the read-only patterns and refuses them with a precise instruction: "Use Read on src/app.ts lines 10 to 20." Claude complies on the next call. Pipelines and anything with side effects pass through untouched. `/right-tool off` for sessions where you want raw Bash.
-
-**How.** `tool.call` with `{ tool: 'Bash' }`, a small parser for the five patterns, `{ deny }` with the rewritten instruction. Fail closed with `.catch`. Keep a counter and show "redirected N calls" in the turn footer via `turn.complete`.
-
-**Nearest neighbour.** None.
-
-**Size.** Small. The parser is the product; start with five patterns and high precision.
-
-## 2. `undo-turn` — revert what the last turn changed
-
-**Pain.** Claude made six edits across four files and broke something. Reverting means git, if you committed, or hunting through `/diff`.
-
-**What it does.** Snapshots each file before Edit, Write, and NotebookEdit, grouped by turn. `/undo` restores the last turn's files and shows what it put back. `/undo 2` goes two turns back. Keeps the last ten turns.
-
-**How.** `tool.call` on the three tools: `$.fs.read` the file before `next(e)`, write the pre-image to a temp directory with `$.fs.write` (`$.store` is capped at 4 MiB, so it holds only the index). `turn.start` opens a new group. `/undo` rewrites the files and logs each path. Creation of a new file is recorded as "delete on undo."
-
-**Nearest neighbour.** Anthropic's `replay-theater` steps through the edits; it doesn't revert them.
-
-**Size.** Small. Why it spreads: "Claude broke it, `/undo`" is the single most reassuring thing a mod can offer.
-
-## 3. `pkg-guard` — hold installs of packages Claude guessed
+## 1. `pkg-guard` — hold installs of packages Claude guessed
 
 **Pain.** Claude runs `npm install some-helper` for a package name it inferred. Typosquats and hallucinated packages are a documented supply-chain vector.
 
@@ -44,7 +20,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Small. Why it spreads: a security story with a concrete screenshot.
 
-## 4. `style-cop` — enforce the style rules Claude keeps ignoring
+## 2. `style-cop` — enforce the style rules Claude keeps ignoring
 
 **Pain.** Verbose code comments by default, ignoring instructions to stop (250 reactions, the most-reacted model-behaviour issue). "Load-bearing" in every reply (181 reactions). Instructions in CLAUDE.md don't hold.
 
@@ -56,7 +32,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Small to medium. Keep enforcement to what can be counted; leave taste to the prompt section.
 
-## 5. `big-output` — keep huge tool output out of context
+## 3. `big-output` — keep huge tool output out of context
 
 **Pain.** One `npm test` or `cat package-lock.json` dumps 50 KB into the context window, and it stays there until compaction. Asked for explicitly in the launch thread.
 
@@ -68,7 +44,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium. The threshold is a `userConfig` option.
 
-## 6. `pins` — instructions that survive compaction and `/clear`
+## 4. `pins` — instructions that survive compaction and `/clear`
 
 **Pain.** "Don't touch the migrations," said an hour ago, is gone after compaction. Rules ignored across session boundaries is the theme of [#69044](https://github.com/anthropics/claude-code/issues/69044).
 
@@ -80,7 +56,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Small.
 
-## 7. `mcp-diet` — choose which MCP tools Claude sees, per project
+## 5. `mcp-diet` — choose which MCP tools Claude sees, per project
 
 **Pain.** Four MCP servers cost one developer 67,000 tokens before the first prompt. Tool search helps, but you can't say "in this repo, hide the Jira tools."
 
@@ -92,7 +68,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium.
 
-## 8. `memory-lint` — know whether your memory index loaded whole
+## 6. `memory-lint` — know whether your memory index loaded whole
 
 **Pain.** The auto-memory index is read at session start up to a limit, and a session can't tell whether it got the whole file, a truncated one, or nothing. A 65-comment thread asks for the threshold to be visible and configurable.
 
@@ -104,7 +80,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Tiny.
 
-## 9. `red-green` — tests run themselves after every turn
+## 7. `red-green` — tests run themselves after every turn
 
 **Pain.** Claude says "done", you run the tests, three fail, and you're back to prompting.
 
@@ -116,7 +92,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium.
 
-## 10. `standup` — your day, written for you
+## 8. `standup` — your day, written for you
 
 **Pain.** Writing the standup update, the changelog entry, or the end-of-day summary of what you and Claude actually did, across several repos.
 
@@ -128,7 +104,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Small to medium.
 
-## 11. `tripwire` — stop secrets leaving the machine
+## 9. `tripwire` — stop secrets leaving the machine
 
 **Pain.** Claude pastes a key into a file that's about to be committed, or runs `curl -d @.env`.
 
@@ -140,7 +116,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium.
 
-## 12. `trust-but-verify` — check what Claude claims against what it ran
+## 10. `trust-but-verify` — check what Claude claims against what it ran
 
 **Pain.** "Tests pass." No test command ran. "Verified in the browser." No browser tool was called. "This was approved earlier." It wasn't. [#69044](https://github.com/anthropics/claude-code/issues/69044) documents months of it.
 

@@ -51,6 +51,18 @@
       ]
     },
     {
+      "name": "right-tool",
+      "source": "./mods/right-tool",
+      "description": "Stop Claude using cat, grep, find, and sed in Bash when the Read, Grep, and Glob tools fit. Each redirected call saves a permission prompt and keeps raw shell output out of context.",
+      "category": "workflow",
+      "tags": [
+        "bash",
+        "context",
+        "permissions",
+        "guard"
+      ]
+    },
+    {
       "name": "show-paths",
       "source": "./mods/show-paths",
       "description": "Put the file path on every Read, Edit, Write, Glob, and Grep row in the transcript, so you never expand a row just to learn which file it touched.",
@@ -59,6 +71,18 @@
         "transcript",
         "files",
         "ui"
+      ]
+    },
+    {
+      "name": "undo-agent",
+      "source": "./mods/undo-agent",
+      "description": "Undo the file edits a subagent made. /rewind restores your own turns, but not a subagent's edits; this snapshots them and puts the files back with one command.",
+      "category": "safety",
+      "tags": [
+        "files",
+        "subagents",
+        "undo",
+        "safety"
       ]
     }
   ]

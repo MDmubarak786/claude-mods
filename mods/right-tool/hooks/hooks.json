@@ -1,0 +1,4 @@
+{
+  "description": "The right-tool hooks module",
+  "modules": ["./register.ts"]
+}
