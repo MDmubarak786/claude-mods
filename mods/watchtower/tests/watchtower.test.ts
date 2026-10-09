@@ -32,7 +32,10 @@ function stubs(on, files: Files = {}, commands = ALL) {
   })
   on('command.list', () => ({ value: commands.map((c) => ({ ...c, description: '', source: 'plugin', isFullscreen: false })) }))
   on('fs.list', () => ({ value: Object.keys(files).map((name, i) => ({ name, kind: 'file', size: 10, mtimeMs: i, isLink: false })) }))
-  on('fs.read', ($, e) => ({ value: JSON.stringify(files[e.path.slice(STORE.length + 1)] ?? {}) }))
+  on('fs.read', ($, e) => {
+    const v = files[e.path.slice(STORE.length + 1)] ?? {}
+    return { value: typeof v === 'string' ? v : JSON.stringify(v) }
+  })
   on('command.register', () => ({ value: undefined }))
   on('ui.log', () => ({ value: undefined }))
   on('session.start', () => ({ cwd: '/work' }))
@@ -134,5 +137,69 @@ test('segments that do not fit a narrow band are dropped from the end', async ($
   const ui = await $.ui.mount({ ...BAND, props: { ...BAND.props, bodyColumns: 30 } })
   expect(await ui.find({ type: 'Text', text: 'fence README.md' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: 'pins 2' })).toBeUndefined()
+  await ui.unmount()
+})
+
+// --- From the review of the first version
+
+const reply = (text: string) => ({ message: { type: 'assistant', role: 'assistant', content: [{ type: 'text', text }] }, door: 'response', origin: { kind: 'model', model: 'm' }, uuid: 'r' })
+
+test('a saved row comes back from the hook unchanged', async ($, on) => {
+  const { clock } = stubs(on, {}, [{ name: 'fence', plugin: 'fence' }])
+  await start($, clock)
+  const row = refused('fence: /work/x is outside the paths the user allowed', 7)
+  const out = await $.session.append(row)
+  expect(out.uuid).toBe('u7')
+  expect(out.message).toEqual(row.message)
+})
+
+test('a refusal whose content is an array of blocks is counted; a non-error row is not', async ($, on) => {
+  const { clock } = stubs(on, {}, [{ name: 'pkg-guard', plugin: 'pkg-guard' }, { name: 'fence', plugin: 'fence' }])
+  await start($, clock)
+  await $.session.append({ ...refused('', 8), message: { type: 'user', role: 'user', content: [{ type: 'tool_result', tool_use_id: 't8', is_error: true, content: [{ type: 'text', text: 'pkg-guard: this install was refused.' }] }] } })
+  await $.session.append({ ...refused('', 9), message: { type: 'user', role: 'user', content: [{ type: 'tool_result', tool_use_id: 't9', is_error: false, content: 'fence: just text that happens to start this way' }] } })
+  const ui = await $.ui.mount(BAND)
+  expect(await ui.find({ type: 'Text', text: 'blocked 1: pkg-guard 1' })).toBeDefined()
+  await ui.unmount()
+})
+
+test('a skipped run reads as skipped, not as a failure', async ($, on) => {
+  const { clock } = stubs(on, { 'red-green_modhub-bbbbbbbbbbbb.json': { 'red-green:/work': { command: 'npm test', enabled: true } } })
+  await start($, clock)
+  await $.session.append(note('red-green: skipped npm test because Claude changed package.json this turn.'))
+  const ui = await $.ui.mount(BAND)
+  expect(await ui.find({ type: 'Text', text: 'tests skipped' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'tests ✘' })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('verdicts quoted in Claude replies are not counted', async ($, on) => {
+  const { clock } = stubs(on, { 'red-green_modhub-bbbbbbbbbbbb.json': { 'red-green:/work': { command: 'npm test', enabled: true } } })
+  await start($, clock)
+  await $.session.append(reply('You will see:\nred-green: tests FAILED, exit 1\ntrust-but-verify: ✘ claims tests pass'))
+  const ui = await $.ui.mount(BAND)
+  expect(await ui.find({ type: 'Text', text: 'tests: npm test' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /unverified/ })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('the band yields while a survey holds it', async ($, on) => {
+  const { clock } = stubs(on, { 'pins_modhub-aaaaaaaaaaaa.json': { 'pins:/work': ['a'] } })
+  await start($, clock)
+  const ui = await $.ui.mount({ ...BAND, props: { ...BAND.props, hasSurvey: true } })
+  expect(await ui.find({ type: 'Text', text: 'watchtower' })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: 'other band content' })).toBeDefined()
+  await ui.unmount()
+})
+
+test('a store file from a hyphenated marketplace is found; a corrupt one is ignored', async ($, on) => {
+  const { clock } = stubs(on, {
+    'fence_my-market-abcdef123456.json': { 'fence:/work': ['/work/lib'] },
+    'pins_modhub-aaaaaaaaaaaa.json': '{ not json',
+  })
+  await start($, clock)
+  const ui = await $.ui.mount(BAND)
+  expect(await ui.find({ type: 'Text', text: 'fence lib' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: /^pins/ })).toBeUndefined()
   await ui.unmount()
 })

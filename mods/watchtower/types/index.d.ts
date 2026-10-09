@@ -13,8 +13,8 @@ export type View = {
   breaker: number | null
   /** red-green's test command for this project, and whether it's on. */
   tests: { command: string; enabled: boolean } | null
-  /** The last red-green verdict seen this session. */
-  lastRun: { ok: boolean; text: string } | null
+  /** The last red-green verdict seen this session: its outcome and the line it came from. */
+  lastRun: { result: 'passed' | 'failed' | 'skipped' | 'error'; text: string } | null
   /** Calls refused this session, by the mod that refused them. */
   blocked: Record<string, number>
   /** Claims trust-but-verify couldn't back this session. */

@@ -7,7 +7,8 @@
 // The line shows only what's active: the fence, how many pins, the breaker
 // threshold, the test command and its last result, the calls the guard mods
 // refused this session, and claims trust-but-verify couldn't back. With
-// nothing active, the band is left to Claude Code and other mods.
+// nothing active, or while a survey holds the band, the band is left to
+// Claude Code and other mods.
 //
 // Settings come from the other mods' own store files under
 // ~/.claude/plugins/store, read only and never written. Activity comes from
@@ -18,12 +19,15 @@ import { atom, read, update } from 'claude-code'
 import type { View } from '../types'
 
 // Mods whose refusals start with "<name>: " and are counted as blocked calls.
-const GUARDS = ['fence', 'right-tool', 'pkg-guard', 'tripwire', 'circuit-breaker', 'style-cop', 'undo-agent']
+const GUARDS = ['fence', 'right-tool', 'pkg-guard', 'tripwire', 'circuit-breaker', 'style-cop']
 const KNOWN = [...GUARDS, 'pins', 'red-green', 'trust-but-verify']
 const DEFAULT_THRESHOLD = 3
 const FIRST_REFRESH_MS = 800
 const REFRESH_EVERY_MS = 15_000
 const SEPARATOR = ' │ '
+// Rows that hold someone's words rather than a mod's verdict: Claude's replies and
+// the person's prompts. A verdict quoted there is not counted.
+const PROSE_DOORS = ['response', 'prompt']
 
 const EMPTY: View = { hidden: false, loaded: [], fence: null, pins: 0, breaker: null, tests: null, lastRun: null, blocked: {}, unverified: 0 }
 const view = atom({ plugin: 'watchtower', key: 'view' } as const, EMPTY)
@@ -34,15 +38,44 @@ let pending = false
 
 type Segment = { text: string; color?: string }
 
+function escapeRe(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 function relative(path: string): string {
   return root && path.startsWith(root + '/') ? path.slice(root.length + 1) : path
 }
 
-// The JSON store file a mod keeps, by its plugin name, newest if there are several
-// (an installed copy and a --plugin-dir copy keep separate files).
+// The project root and the home folder, looked up once and again if a lookup failed.
+async function ensurePaths($) {
+  if (!root) {
+    try {
+      root = await $.session.root()
+    } catch {
+      root = ''
+    }
+  }
+  if (!home) {
+    try {
+      home = (await $.process.run(['printenv', 'HOME'])).stdout.trim()
+    } catch {
+      home = ''
+    }
+  }
+}
+
+// The JSON store file a mod keeps, by its plugin name. Files are named
+// <plugin>_<marketplace>-<hash>.json. This repository's own marketplace and
+// --plugin-dir copies are preferred; any other marketplace without an underscore
+// in its name is the fallback. Newest first when there are several.
 async function storeOf($, entries, name: string): Promise<Record<string, unknown>> {
-  const re = new RegExp('^' + name + '_[A-Za-z0-9.]+-[0-9a-f]+\\.json$')
-  const match = entries.filter((x) => x.kind === 'file' && re.test(x.name)).sort((a, b) => b.mtimeMs - a.mtimeMs)[0]
+  const n = escapeRe(name)
+  const preferred = new RegExp('^' + n + '_(?:modhub|inline)-[0-9a-f]+\\.json$')
+  const fallback = new RegExp('^' + n + '_[A-Za-z0-9.-]+-[0-9a-f]+\\.json$')
+  const files = entries.filter((x) => x.kind === 'file')
+  let candidates = files.filter((x) => preferred.test(x.name))
+  if (!candidates.length) candidates = files.filter((x) => fallback.test(x.name))
+  const match = candidates.sort((a, b) => b.mtimeMs - a.mtimeMs)[0]
   if (!match) return {}
   try {
     const data = JSON.parse(await $.fs.read(home + '/.claude/plugins/store/' + match.name))
@@ -53,7 +86,8 @@ async function storeOf($, entries, name: string): Promise<Record<string, unknown
 }
 
 // Re-read which mods are loaded and what they're set to. Session counts are kept.
-async function refresh($) {
+async function readSettings($) {
+  await ensurePaths($)
   let loaded: string[] = []
   try {
     const plugins = new Set((await $.command.list()).map((c) => String(c.plugin ?? '').split('@')[0]))
@@ -95,6 +129,15 @@ async function refresh($) {
   })
 }
 
+// Timers and handlers call this; a failed read leaves the band as it was.
+async function refresh($) {
+  try {
+    await readSettings($)
+  } catch {
+    // Best effort: the next refresh tries again.
+  }
+}
+
 // Coalesce bursts (several command rows at once) into one refresh.
 function schedule($) {
   if (pending) return
@@ -111,9 +154,13 @@ function textOf(content: unknown): string {
   return ''
 }
 
+const VERDICT = /(?:^|Last run: )red-green: (tests passed|tests FAILED|skipped|could not run)[^\n]*/m
+const RESULT_OF = { 'tests passed': 'passed', 'tests FAILED': 'failed', skipped: 'skipped', 'could not run': 'error' } as const
+
 // Count what a saved row says the guard mods did.
 async function observe($, e) {
   if (e.door === 'command') schedule($)
+  const prose = PROSE_DOORS.includes(e.door)
   let blockedBy: string | null = null
   let run: View['lastRun'] = null
   let unverified = 0
@@ -123,12 +170,13 @@ async function observe($, e) {
       if (m && GUARDS.includes(m[1])) blockedBy = m[1]
     }
     // Verdict lines arrive as text: a red-green or trust-but-verify line under an
-    // answer, or a /red-green status reply.
-    const text = b.type === 'text' ? String(b.text ?? '') : ''
-    if (!text) continue
-    const rg = /red-green: (tests passed|tests FAILED|skipped|could not run)[^\n]*/.exec(text)
-    if (rg) run = { ok: rg[1] === 'tests passed', text: rg[0] }
-    if (text.includes('trust-but-verify:')) unverified += (text.match(/✘/g) ?? []).length
+    // answer, or a /red-green status reply. Never from Claude's or the person's words.
+    if (prose || b.type !== 'text') continue
+    const text = String(b.text ?? '')
+    const rg = VERDICT.exec(text)
+    if (rg) run = { result: RESULT_OF[rg[1]], text: rg[0].replace(/^Last run: /, '') }
+    const tv = /^trust-but-verify: [\s\S]*/m.exec(text)
+    if (tv) unverified += (tv[0].match(/✘/g) ?? []).length
   }
   if (!blockedBy && !run && !unverified) return
   await update($, view, (v) => ({
@@ -139,15 +187,20 @@ async function observe($, e) {
   }))
 }
 
+function testSegment(v: View): Segment {
+  if (!v.lastRun) return { text: 'tests: ' + v.tests.command }
+  if (v.lastRun.result === 'passed') return { text: 'tests ✔', color: 'green' }
+  if (v.lastRun.result === 'failed') return { text: 'tests ✘', color: 'red' }
+  if (v.lastRun.result === 'skipped') return { text: 'tests skipped', color: 'yellow' }
+  return { text: 'tests not run', color: 'yellow' }
+}
+
 function segments(v: View): Segment[] {
   const out: Segment[] = []
   if (v.fence) out.push({ text: 'fence ' + v.fence[0] + (v.fence.length > 1 ? ' +' + (v.fence.length - 1) : ''), color: 'yellow' })
   if (v.pins > 0) out.push({ text: 'pins ' + v.pins })
   if (v.breaker !== null) out.push({ text: v.breaker > 0 ? 'breaker ' + v.breaker : 'breaker off' })
-  if (v.tests && v.tests.enabled) {
-    if (v.lastRun) out.push(v.lastRun.ok ? { text: 'tests ✔', color: 'green' } : { text: 'tests ✘', color: 'red' })
-    else out.push({ text: 'tests: ' + v.tests.command })
-  }
+  if (v.tests && v.tests.enabled) out.push(testSegment(v))
   const blocked = Object.entries(v.blocked).sort((a, b) => b[1] - a[1])
   const total = blocked.reduce((n, [, c]) => n + c, 0)
   if (total > 0) out.push({ text: 'blocked ' + total + ': ' + blocked.map(([m, c]) => m + ' ' + c).join(', '), color: 'yellow' })
@@ -185,16 +238,7 @@ function statusText(v: View): string {
 
 export function register(on) {
   on('session.start', async ($, e, next) => {
-    try {
-      root = await $.session.root()
-    } catch {
-      root = ''
-    }
-    try {
-      home = (await $.process.run(['printenv', 'HOME'])).stdout.trim()
-    } catch {
-      home = ''
-    }
+    await ensurePaths($)
     try {
       if ((await $.store.get('hidden')) === true) await update($, view, (v) => ({ ...v, hidden: true }))
     } catch {
@@ -242,6 +286,8 @@ export function register(on) {
   }).catch(async ($, e, next) => next(e))
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    // A survey holds the band while it asks; yield to it.
+    if (e.props.hasSurvey) return next(e)
     const v = await read($, view)
     const all = v.hidden ? [] : segments(v)
     if (!all.length) return next(e)
