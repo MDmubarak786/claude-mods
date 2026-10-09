@@ -167,6 +167,18 @@
       ]
     },
     {
+      "name": "tripwire",
+      "source": "./mods/tripwire",
+      "description": "Stop secrets leaving the machine. Holds an edit or command that writes an API key, a private key, or a credential literal, a command that reads a secret file and talks to the network, and a git commit whose staged changes contain a secret. Refuses by default.",
+      "category": "safety",
+      "tags": [
+        "safety",
+        "secrets",
+        "git",
+        "guard"
+      ]
+    },
+    {
       "name": "undo-agent",
       "source": "./mods/undo-agent",
       "description": "Undo the file edits a subagent made. /rewind restores your own turns, but not a subagent's edits; this snapshots them and puts the files back with one command.",

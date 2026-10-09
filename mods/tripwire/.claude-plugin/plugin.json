@@ -1,0 +1,10 @@
+{
+  "name": "tripwire",
+  "version": "0.1.0",
+  "description": "Stop secrets leaving the machine. Holds an edit or command that writes an API key, a private key, or a credential literal, a command that reads a secret file and talks to the network, and a git commit whose staged changes contain a secret. Refuses by default.",
+  "author": { "name": "Mohammed Mubarak" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/tripwire",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["mod"]
+}
