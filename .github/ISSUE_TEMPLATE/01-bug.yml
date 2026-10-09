@@ -1,0 +1,112 @@
+name: Bug in a mod
+description: A mod does the wrong thing, or nothing at all.
+title: "[bug] <mod>: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. If a mod reads, runs, or sends something it shouldn't, don't file it here: [report it privately](https://github.com/MDmubarak786/claude-mods/security/advisories/new).
+  - type: dropdown
+    id: mod
+    attributes:
+      label: Which mod
+      options:
+        # mods:start
+        - big-output
+        - circuit-breaker
+        - copy-last
+        - ding
+        - fence
+        - mcp-diet
+        - memory-lint
+        - pins
+        - pkg-guard
+        - red-green
+        - right-tool
+        - show-paths
+        - standup
+        - style-cop
+        - tripwire
+        - trust-but-verify
+        - undo-agent
+        # mods:end
+    validations:
+      required: true
+  - type: input
+    id: mod-version
+    attributes:
+      label: Mod version
+      description: Shown in `/plugin` under **Installed**, or in the mod's `plugin.json`.
+      placeholder: 0.1.1
+    validations:
+      required: true
+  - type: input
+    id: claude-version
+    attributes:
+      label: Claude Code version
+      description: Output of `claude --version`, or the Claude Code row of `/status` in the Desktop app.
+      placeholder: 2.1.295
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where you ran it
+      options:
+        - Terminal
+        - Desktop app (Code tab)
+        - VS Code extension
+        - JetBrains plugin
+        - claude -p or the Agent SDK
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Linux
+        - Windows
+        - Windows (WSL)
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The prompt or command, and what Claude did, as small as you can make it.
+      placeholder: |
+        1. Install the mod and run /reload-plugins
+        2. Ask Claude to ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: If the mod did nothing, include the mods line from `/plugin` (for example `3 mods active · fence, ...`).
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Lines from the debug log or the transcript that name the mod, or the output of `claude plugin validate` on the mod. Remove anything private first.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you submit
+      options:
+        - label: I searched open and closed issues for this bug.
+          required: true
+        - label: I'm on the latest version of the mod (`/plugin marketplace update modhub`).
+          required: true

@@ -1,0 +1,65 @@
+name: New mod idea
+description: Propose a mod before building it, so we can say yes early.
+title: "[idea] "
+labels: ["idea", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Every mod in this repository starts from a problem developers have on record, checks that no existing mod already covers it, and names the events and API calls that make it work. The [roadmap](https://github.com/MDmubarak786/claude-mods/blob/main/docs/roadmap.md) and [ecosystem survey](https://github.com/MDmubarak786/claude-mods/blob/main/docs/ecosystem.md) show what's planned and what's already crowded.
+  - type: input
+    id: name
+    attributes:
+      label: Proposed name
+      description: Lowercase letters, digits, and hyphens. No "claude" or "anthropic", which Claude Code reserves.
+      placeholder: my-mod
+    validations:
+      required: true
+  - type: textarea
+    id: pain
+    attributes:
+      label: The pain it removes
+      description: What goes wrong today, in one or two sentences.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Links to issues, discussions, or posts where developers hit this. Your own experience counts; say how often.
+    validations:
+      required: true
+  - type: textarea
+    id: neighbour
+    attributes:
+      label: Nearest existing mod
+      description: The closest mod in this repository or the wider ecosystem, and why it isn't enough. "None" is a fine answer if you looked.
+    validations:
+      required: true
+  - type: textarea
+    id: how
+    attributes:
+      label: How it would work
+      description: Which events it hooks (`tool.call`, `turn.complete`, `ui.render`...) and which `$` calls it makes. Rough is fine.
+    validations:
+      required: true
+  - type: dropdown
+    id: draws
+    attributes:
+      label: Where it draws
+      options:
+        - Nothing, it only acts on events
+        - A tool row, a message, or the turn footer
+        - A pane
+        - The band above the prompt
+        - A status line or toast
+    validations:
+      required: true
+  - type: checkboxes
+    id: policy
+    attributes:
+      label: Policy
+      options:
+        - label: It doesn't need to approve tool calls, read secrets, or send data off the machine. If it does, I've explained why above.
+          required: true
+        - label: I'd like to build it myself.

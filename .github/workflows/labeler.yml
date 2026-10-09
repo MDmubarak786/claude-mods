@@ -1,0 +1,29 @@
+name: label pull requests
+
+# pull_request_target runs with the base repository's token so labels can be added to
+# pull requests from forks. It never checks out or runs the pull request's code.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          sync-labels: false
+      - name: Label pull requests that add a mod
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          added=$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[] | select(.status == "added") | .filename' | grep -E '^mods/[^/]+/\.claude-plugin/plugin\.json$' || true)
+          if [ -n "$added" ]; then
+            gh pr edit "$PR" --repo "$REPO" --add-label new-mod
+          fi

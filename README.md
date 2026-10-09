@@ -1,5 +1,10 @@
 # claude-mods
 
+[![validate](https://github.com/MDmubarak786/claude-mods/actions/workflows/validate.yml/badge.svg)](https://github.com/MDmubarak786/claude-mods/actions/workflows/validate.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Claude Code 2.1.287+](https://img.shields.io/badge/Claude%20Code-2.1.287%2B-d97757.svg)](https://code.claude.com/docs/en/plugins/mods/overview)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
 Community mods for [Claude Code](https://code.claude.com/docs/en/plugins/mods/overview). A mod is a plugin that runs *inside* Claude Code: it can guard a tool call, draw a pane beside the transcript, add a `/command`, or watch a turn. This repository is a marketplace named **`modhub`**, so every mod here installs with two commands and updates like any other plugin.
 
 > **Mods run with your permissions and are not sandboxed.** Read [Is this safe?](#is-this-safe) before installing anything, here or anywhere else.
@@ -84,7 +89,7 @@ scripts/new-mod.sh my-mod "One sentence saying what it does"
 claude --plugin-dir ./mods/my-mod
 ```
 
-That scaffolds a working mod from [`templates/mod`](templates/mod/), registers it in the marketplace, and validates it. [CONTRIBUTING.md](CONTRIBUTING.md) covers the rest: the README template, tests, version bumps, and what reviewers look for.
+That scaffolds a working mod from [`templates/mod`](templates/mod/), registers it in the marketplace, and validates it. [CONTRIBUTING.md](CONTRIBUTING.md) covers the rest: branches, the README template, tests, version bumps, and what has to pass before merge. Questions go to [Discussions](https://github.com/MDmubarak786/claude-mods/discussions); see [SUPPORT.md](SUPPORT.md).
 
 ## Layout
 
@@ -94,7 +99,7 @@ mods/<name>/                      One complete plugin per directory.
 templates/mod/                    What scripts/new-mod.sh copies.
 scripts/                          new-mod, try, install, validate, ship, and the checks CI runs.
 docs/                             Roadmap, review checklist.
-.github/                          CI, issue and PR templates, CODEOWNERS.
+.github/                          CI, labeler, Dependabot, issue forms, PR template, CODEOWNERS.
 ```
 
 ## License

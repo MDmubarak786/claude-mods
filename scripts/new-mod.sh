@@ -62,7 +62,8 @@ Created mods/$name.
 Next:
   1. scripts/try.sh $name                 load it in a session and edit hooks/register.ts while it runs
   2. cd mods/$name && claude plugin test  run its tests
-  3. Fill in mods/$name/README.md
+  3. Fill in mods/$name/README.md, then: node scripts/sync-touches.mjs
   4. Add a line for /mods/$name/ to .github/CODEOWNERS
   5. Set category and tags for $name in .claude-plugin/marketplace.json
+  6. scripts/ship.sh $name "Add $name: <what it does>" --pr   branch, commit, and open the pull request
 MSG
