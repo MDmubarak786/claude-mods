@@ -144,6 +144,17 @@
       ]
     },
     {
+      "name": "standup",
+      "source": "./mods/standup",
+      "description": "Your day, written for you. Every turn is logged; /standup turns today's work across every session on the machine into a three-bullet update, or a Markdown file.",
+      "category": "workflow",
+      "tags": [
+        "workflow",
+        "reporting",
+        "model"
+      ]
+    },
+    {
       "name": "style-cop",
       "source": "./mods/style-cop",
       "description": "Enforce the style rules Claude keeps ignoring: banned words and phrases, a comment-density cap on added code, and files that must not gain comments. Rules live in .claude/style-cop.md and are both shown to Claude and enforced on edits.",

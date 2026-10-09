@@ -1,0 +1,4 @@
+{
+  "description": "The standup hooks module",
+  "modules": ["./register.ts"]
+}
