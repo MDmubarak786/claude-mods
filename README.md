@@ -9,14 +9,14 @@ Community mods for [Claude Code](https://code.claude.com/docs/en/plugins/mods/ov
 Inside a Claude Code session (v2.1.287 or later):
 
 ```text
-/plugin marketplace add OWNER/claude-mods
+/plugin marketplace add MDmubarak786/claude-mods
 /plugin install fence@modhub
 ```
 
 Or from your shell:
 
 ```bash
-claude plugin marketplace add OWNER/claude-mods
+claude plugin marketplace add MDmubarak786/claude-mods
 claude plugin install fence@modhub --scope user
 ```
 
@@ -25,7 +25,7 @@ Run `/reload-plugins` in any session that was already open. To remove a mod, run
 Try a mod for one session without installing it:
 
 ```bash
-git clone https://github.com/OWNER/claude-mods.git
+git clone https://github.com/MDmubarak786/claude-mods.git
 cd claude-mods
 claude --plugin-dir ./mods/fence
 ```
@@ -55,7 +55,7 @@ What this repository does about it:
 Check any mod yourself before you install it:
 
 ```bash
-git clone https://github.com/OWNER/claude-mods.git
+git clone https://github.com/MDmubarak786/claude-mods.git
 claude plugin validate ./claude-mods/mods/fence
 ```
 

@@ -2,7 +2,7 @@
   "name": "modhub",
   "owner": {
     "name": "modhub maintainers",
-    "url": "https://github.com/OWNER/claude-mods"
+    "url": "https://github.com/MDmubarak786/claude-mods"
   },
   "description": "Community mods for Claude Code: guards, panes, and commands that run inside Claude Code itself.",
   "plugins": [

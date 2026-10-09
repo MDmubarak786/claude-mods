@@ -11,7 +11,7 @@ __DESCRIPTION__
 ## Install
 
 ```text
-/plugin marketplace add OWNER/claude-mods
+/plugin marketplace add MDmubarak786/claude-mods
 /plugin install __NAME__@modhub
 ```
 

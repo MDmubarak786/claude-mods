@@ -9,7 +9,7 @@ set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 marketplace="$(node -p "require('$root/.claude-plugin/marketplace.json').name")"
-source_spec="OWNER/claude-mods"
+source_spec="MDmubarak786/claude-mods"
 
 if [[ "${1:-}" == "--local" ]]; then
   source_spec="$root"

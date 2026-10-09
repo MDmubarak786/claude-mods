@@ -6,6 +6,6 @@
 .vscode/
 node_modules/
 # Per-user Claude Code state. .claude/settings.json itself is worth committing:
-# `claude plugin marketplace add OWNER/claude-mods --scope project` writes it.
+# `claude plugin marketplace add MDmubarak786/claude-mods --scope project` writes it.
 .claude/.cc-writes/
 .claude/settings.local.json

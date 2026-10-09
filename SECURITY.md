@@ -4,7 +4,7 @@ Mods run inside Claude Code's process with the user's permissions. Nothing in th
 
 ## Report a problem
 
-If a mod in this repository does something it shouldn't, open a [security advisory](https://github.com/OWNER/claude-mods/security/advisories/new) rather than a public issue. Include the mod name, the version from its `plugin.json`, and what you observed. We aim to respond within three days and to pull or patch an affected mod before discussing details publicly.
+If a mod in this repository does something it shouldn't, open a [security advisory](https://github.com/MDmubarak786/claude-mods/security/advisories/new) rather than a public issue. Include the mod name, the version from its `plugin.json`, and what you observed. We aim to respond within three days and to pull or patch an affected mod before discussing details publicly.
 
 ## What a merged mod must not do
 

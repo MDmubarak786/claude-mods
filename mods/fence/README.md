@@ -7,7 +7,7 @@ Use it when you say "only touch `src/billing`" and want that enforced, not just 
 ## Install
 
 ```text
-/plugin marketplace add OWNER/claude-mods
+/plugin marketplace add MDmubarak786/claude-mods
 /plugin install fence@modhub
 ```
 
