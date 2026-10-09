@@ -37,6 +37,10 @@ echo "== README table"
 node scripts/update-readme.mjs --check || failed=1
 
 echo
+echo "== README hooks and calls blocks"
+node scripts/sync-touches.mjs --check || failed=1
+
+echo
 if [[ $failed -ne 0 ]]; then
   echo "FAILED"
   exit 1

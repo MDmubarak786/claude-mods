@@ -64,7 +64,7 @@ Fill in every section of the generated `mods/my-mod/README.md`. Reviewers check 
 
 - **What it does** in two or three sentences a stranger understands.
 - **A screenshot or recording** if the mod draws anything. Put it in `mods/my-mod/screenshots/`.
-- **Hooks and calls**: paste the `hooks:` and `calls:` lines from `claude plugin validate ./mods/my-mod`. This is how users decide whether to trust the mod.
+- **Hooks and calls**: the fenced block under **What it touches** must be exactly the `hooks:` and `calls:` lines `claude plugin validate ./mods/my-mod` prints. `node scripts/sync-touches.mjs` pastes them for you, and CI fails if they drift. This is how users decide whether to trust the mod.
 - **Tested with**: the exact `claude --version` you tested on, and the surface (terminal, Desktop app, or both). Events change between releases.
 - **Limitations**: what it can't catch or doesn't handle. Honest limitations are what make a safety mod trustworthy.
 
@@ -75,7 +75,7 @@ Fill in every section of the generated `mods/my-mod/README.md`. Reviewers check 
 - Don't set `version` in the marketplace entry. `plugin.json` is the single source of truth.
 - Fill in the pull request template. It's short.
 
-A maintainer reviews against the [review checklist](docs/review-checklist.md). Expect questions about anything the mod reads, writes, runs, or sends.
+A maintainer reviews against the [review checklist](docs/review-checklist.md). Expect questions about anything the mod reads, writes, runs, or sends. Maintainers land each mod with `scripts/ship.sh <name>`, which commits one mod with only its own catalog row so every commit on `main` validates alone.
 
 ## After it's merged
 

@@ -39,7 +39,7 @@ From `claude plugin validate ./mods/memory-lint`:
 
 ```text
 hooks: session.start, classic.SessionStart{source=compact|clear|resume}, tool.call{tool=Edit|Write}, command.run{command=memory-lint}
-calls: $.command.register, $.fs.exists (via measure), $.fs.read (via measure), $.process.run (via locate), $.session.root (via locate), $.store.get (via locate), $.store.set, $.ui.log (via lint), $.ui.status (via lint)
+calls: $.command.register, $.fs.exists (via measure), $.fs.read (via measure), $.process.run (via locate), $.session.root (via locate), $.store.get (via locate), $.store.set, $.ui.log, $.ui.status (via lint)
 ```
 
 - **`$.process.run`** runs `printenv HOME` once at session start to find your Claude directory. Nothing else is run.

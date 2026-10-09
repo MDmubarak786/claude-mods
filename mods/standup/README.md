@@ -40,7 +40,7 @@ From `claude plugin validate ./mods/standup`:
 
 ```text
 hooks: session.start, tool.call{tool=Edit|Write|MultiEdit|NotebookEdit}, turn.complete, command.run{command=standup}
-calls: $.command.register, $.fs.write, $.model.complete, $.session.id, $.session.root, $.store.delete (via prune), $.store.get (via record, gather), $.store.keys (via prune, gather), $.store.set (via record), $.ui.log (via record)
+calls: $.command.register, $.fs.write, $.model.complete, $.session.id, $.session.root, $.store.delete (via prune), $.store.get (via gather, record), $.store.keys (via gather, prune), $.store.set (via record), $.ui.log
 ```
 
 - **`$.model.complete`** sends the log to Haiku only when you run `/standup` without `raw`, on your plan or API key. The call has no conversation history.

@@ -49,7 +49,7 @@ From `claude plugin validate ./mods/pkg-guard`:
 
 ```text
 hooks: session.start, command.run{command=pkg-guard}, tool.call{tool=Bash}
-calls: $.command.register, $.fs.exists (via inLockfile), $.fs.read (via inLockfile), $.http.fetch (via lookup), $.store.get (via check), $.store.set (via check), $.ui.ask, $.ui.log
+calls: $.command.register, $.fs.exists (via inLockfile), $.fs.read (via inLockfile), $.http.fetch (via lookup), $.store.get, $.store.set, $.ui.ask, $.ui.log
 ```
 
 - **`$.http.fetch`** sends only the package name to the public registries listed above, over HTTPS, and only for a package that isn't in your lockfile. Nothing else leaves the machine.

@@ -38,7 +38,7 @@ From `claude plugin validate ./mods/big-output`:
 
 ```text
 hooks: session.start, command.run{command=big-output}, tool.call{tool=Bash}, tool.call{tool=mcp__big-output__slice}
-calls: $.command.register, $.fs.read (via slice), $.fs.write (via save), $.process.run, $.store.get, $.store.set, $.tool.register, $.ui.log
+calls: $.command.register, $.fs.read, $.fs.write (via save), $.process.run, $.store.get, $.store.set, $.tool.register, $.ui.log
 ```
 
 - **`$.process.run`** runs `mktemp -d` once at session start for the scratch directory. Nothing else is run.

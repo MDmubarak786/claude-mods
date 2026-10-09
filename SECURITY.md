@@ -12,7 +12,7 @@ A mod is refused, or removed, if it:
 
 - **Approves tool calls** by returning `allow` from `tool.check` or by answering `tool.call` for a call it didn't originate, unless the mod's entire purpose is a documented policy guard and the README says so.
 - **Reads secrets** through `$.env.get` or `$.settings.read` for anything beyond its own documented `userConfig` option.
-- **Sends data off the machine** with `$.http.fetch` or `$.process.run` unless the README names the endpoint, the user opted in through `userConfig`, and the data sent is listed.
+- **Sends data off the machine** with `$.http.fetch` or `$.process.run` unless the call is the mod's stated purpose or sits behind a setting, the README names the endpoint, and the data sent is listed. `pkg-guard` looking up a package name on its registry is the model case.
 - **Submits prompts** with `$.prompt.submit({ asUser: true })`. A mod may start a turn in its own name; it may not speak as the user.
 - **Rewrites what the user typed** in `prompt.submit` beyond what the README describes.
 - **Runs code it fetched at runtime**, or imports anything outside its own directory.

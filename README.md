@@ -92,7 +92,7 @@ That scaffolds a working mod from [`templates/mod`](templates/mod/), registers i
 .claude-plugin/marketplace.json   The catalog. One entry per mod.
 mods/<name>/                      One complete plugin per directory.
 templates/mod/                    What scripts/new-mod.sh copies.
-scripts/                          new-mod, validate, try, install, update-readme.
+scripts/                          new-mod, try, install, validate, ship, and the checks CI runs.
 docs/                             Roadmap, review checklist.
 .github/                          CI, issue and PR templates, CODEOWNERS.
 ```

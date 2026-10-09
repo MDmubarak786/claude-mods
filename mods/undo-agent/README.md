@@ -39,7 +39,7 @@ From `claude plugin validate ./mods/undo-agent`:
 
 ```text
 hooks: session.start, tool.call{tool=Edit|Write|NotebookEdit}, turn.complete, command.run{command=undo-agent}
-calls: $.command.register, $.fs.exists (via snapshot, restore), $.fs.read (via snapshot, restore), $.fs.stat (via snapshot, restore), $.fs.write (via snapshot, restore), $.process.run (via restore), $.ui.ask, $.ui.log
+calls: $.command.register, $.fs.exists, $.fs.read, $.fs.stat, $.fs.write, $.process.run, $.ui.ask, $.ui.log
 ```
 
 - **`$.process.run`** runs `mktemp -d` once at session start for a scratch directory, and `rm -f -- <path>` only on a file the agent created, only when you run `/undo-agent`, and the path is printed. Nothing else is run.
