@@ -3,7 +3,7 @@
 // Usage: node scripts/sync-touches.mjs            rewrite every mod's block
 //        node scripts/sync-touches.mjs --check    exit 1 if any block differs
 import { execFileSync } from 'node:child_process'
-import { readdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -13,6 +13,8 @@ let failed = 0
 
 for (const name of readdirSync(join(root, 'mods')).sort()) {
   const dir = join(root, 'mods', name)
+  // A folder left behind by a branch switch (only gitignored generated types) is not a mod.
+  if (!existsSync(join(dir, '.claude-plugin', 'plugin.json'))) continue
   let out = ''
   try {
     out = execFileSync('claude', ['plugin', 'validate', dir], { encoding: 'utf8' })

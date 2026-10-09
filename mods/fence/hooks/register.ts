@@ -10,6 +10,9 @@
 // can't check a path, the edit doesn't happen.
 
 const USAGE = 'No fence set. Usage: /fence src/ docs/README.md    (or /fence off)'
+// Words people type expecting a switch. Treating one as a path would fence the
+// project to a file that doesn't exist, so they get the usage line instead.
+const NOT_PATHS = ['on', 'enable', 'enabled', 'set', 'show', 'status', 'list', 'help', '?']
 
 // Resolve a path to an absolute, normalized form: no trailing slash, and no
 // "." or ".." segments, so "src/../package.json" compares as "package.json".
@@ -80,6 +83,10 @@ export function register(on) {
     if (args === 'off') {
       await $.store.delete(key)
       return { text: 'Fence removed. Claude may edit any file.' }
+    }
+    if (NOT_PATHS.includes(args.toLowerCase())) {
+      const current = describe(await $.store.get(key))
+      return { text: (current.length ? 'Fence: ' + current.join(', ') + '. ' : '') + 'To set a fence, name the paths: /fence src/ docs/README.md. To remove it: /fence off.' }
     }
     if (!args) {
       const current = describe(await $.store.get(key))
