@@ -52,7 +52,7 @@ cd mods/my-mod && claude plugin test
 
 Put tests in `tests/*.test.ts`. The [test page](https://code.claude.com/docs/en/plugins/mods/test) shows how to stub the store, a model call, a timer, and how to press buttons in a pane. At minimum, test the event your mod exists for: the deny, the rewrite, or the command's reply.
 
-Run everything CI runs before you open a pull request:
+Run everything CI runs before you push:
 
 ```bash
 scripts/validate.sh
@@ -68,53 +68,14 @@ Fill in every section of the generated `mods/my-mod/README.md`. Reviewers check 
 - **Tested with**: the exact `claude --version` you tested on, and the surface (terminal, Desktop app, or both). Events change between releases.
 - **Limitations**: what it can't catch or doesn't handle. Honest limitations are what make a safety mod trustworthy.
 
-## Branches
-
-`main` is protected. Nobody pushes to it directly, maintainers included; every change lands through a pull request. Work on a branch named for what it changes:
-
-| Branch | For |
-| :-- | :-- |
-| `mod/<name>` | A new mod |
-| `fix/<name>-<topic>` | A bug fix in one mod |
-| `feat/<name>-<topic>` | An improvement to one mod |
-| `docs/<topic>` | Documentation and templates only |
-| `ci/<topic>` | Workflows and scripts |
-| `chore/<topic>` | Repository housekeeping |
-
-Fork the repository if you don't have write access, and branch in your fork. Keep a branch to one mod; two mods means two branches and two pull requests.
-
-## Commit messages and pull request titles
-
-Pull requests are squash-merged, so the title becomes the one commit on `main`. Write it as:
-
-| Change | Title |
-| :-- | :-- |
-| A new mod | `Add <name>: <what it does>` |
-| A change to one mod | `<name> <new version>: <what changed>` |
-| Anything else | `docs: ...`, `ci: ...`, or `chore: ...` |
-
-Commits on your branch can say whatever helps you; they're folded into one.
-
 ## Open the pull request
 
 - One mod per pull request.
 - A change to an existing mod bumps `version` in its `plugin.json`. Claude Code only delivers a plugin to installed users when the version string changes, so an unbumped change never reaches anyone. CI checks this.
 - Don't set `version` in the marketplace entry. `plugin.json` is the single source of truth.
-- Fill in the pull request template. It's mostly checkboxes.
-- Open it as a draft while you're still working, and mark it ready when `scripts/validate.sh` passes.
+- Fill in the pull request template. It's short.
 
-## What has to pass before merge
-
-Branch protection on `main` requires all of these:
-
-- **The `validate` check passes** on the latest commit, and the branch is up to date with `main`. It runs strict validation on the catalog and every mod, every mod's tests, the README table and issue-form lists, the touches blocks, and the version-bump check.
-- **One approving review from a code owner.** `.github/CODEOWNERS` names who that is for each directory. A new commit after the review dismisses it.
-- **Every review conversation is resolved.**
-- **Linear history.** Squash merge is the only merge button; the branch is deleted after merge.
-
-A maintainer reviews against the [review checklist](docs/review-checklist.md). Expect questions about anything the mod reads, writes, runs, or sends.
-
-**Maintainers** can land a mod with `scripts/ship.sh <name> "<title>" --pr`, which commits one mod on its own branch with only its own catalog row and opens the pull request. [docs/maintaining.md](docs/maintaining.md) covers merging, labels, releases, and the repository settings.
+A maintainer reviews against the [review checklist](docs/review-checklist.md). Expect questions about anything the mod reads, writes, runs, or sends. Maintainers land each mod with `scripts/ship.sh <name>`, which commits one mod with only its own catalog row so every commit on `main` validates alone.
 
 ## After it's merged
 

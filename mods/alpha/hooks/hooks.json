@@ -1,4 +1,0 @@
-{
-  "description": "The alpha hooks module",
-  "modules": ["./register.ts"]
-}

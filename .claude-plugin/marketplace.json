@@ -7,13 +7,6 @@
   "description": "Community mods for Claude Code: guards, panes, and commands that run inside Claude Code itself.",
   "plugins": [
     {
-      "name": "alpha",
-      "source": "./mods/alpha",
-      "description": "First test mod",
-      "category": "other",
-      "tags": []
-    },
-    {
       "name": "big-output",
       "source": "./mods/big-output",
       "description": "Keep huge shell output out of the context window. A Bash result over a threshold is saved to a file and Claude gets its head and tail plus a slice tool to grep or page the rest on demand.",
