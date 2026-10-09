@@ -19,6 +19,16 @@
       ]
     },
     {
+      "name": "copy-last",
+      "source": "./mods/copy-last",
+      "description": "Copy Claude's last reply, or its last code block, to the clipboard as clean Markdown with /copy, with no terminal indentation or trailing spaces.",
+      "category": "workflow",
+      "tags": [
+        "clipboard",
+        "workflow"
+      ]
+    },
+    {
       "name": "ding",
       "source": "./mods/ding",
       "description": "Play a sound and post a desktop notification when Claude finishes a turn or needs you to answer a question or a permission prompt.",
@@ -38,6 +48,17 @@
         "safety",
         "files",
         "guard"
+      ]
+    },
+    {
+      "name": "show-paths",
+      "source": "./mods/show-paths",
+      "description": "Put the file path on every Read, Edit, Write, Glob, and Grep row in the transcript, so you never expand a row just to learn which file it touched.",
+      "category": "transcript",
+      "tags": [
+        "transcript",
+        "files",
+        "ui"
       ]
     }
   ]

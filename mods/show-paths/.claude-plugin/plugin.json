@@ -1,0 +1,10 @@
+{
+  "name": "show-paths",
+  "version": "0.1.0",
+  "description": "Put the file path on every Read, Edit, Write, Glob, and Grep row in the transcript, so you never expand a row just to learn which file it touched.",
+  "author": { "name": "Mohammed Mubarak" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/show-paths",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["mod"]
+}

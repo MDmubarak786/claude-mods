@@ -1,0 +1,4 @@
+{
+  "description": "The show-paths hooks module",
+  "modules": ["./register.ts"]
+}
