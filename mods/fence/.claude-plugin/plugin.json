@@ -1,6 +1,6 @@
 {
   "name": "fence",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Limit which paths Claude may edit in a project with one /fence command. Edits outside the fence are refused with a reason Claude can act on.",
   "author": { "name": "modhub maintainers" },
   "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/fence",

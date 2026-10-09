@@ -7,11 +7,38 @@
   "description": "Community mods for Claude Code: guards, panes, and commands that run inside Claude Code itself.",
   "plugins": [
     {
+      "name": "circuit-breaker",
+      "source": "./mods/circuit-breaker",
+      "description": "Stop Claude from retrying the same failing shell command over and over. After N identical failures the next attempt is held, and you choose: stop, or try once more.",
+      "category": "safety",
+      "tags": [
+        "safety",
+        "bash",
+        "guard",
+        "loops"
+      ]
+    },
+    {
+      "name": "ding",
+      "source": "./mods/ding",
+      "description": "Play a sound and post a desktop notification when Claude finishes a turn or needs you to answer a question or a permission prompt.",
+      "category": "workflow",
+      "tags": [
+        "notifications",
+        "sound",
+        "workflow"
+      ]
+    },
+    {
       "name": "fence",
       "source": "./mods/fence",
       "description": "Limit which paths Claude may edit in a project with one /fence command. Edits outside the fence are refused with a reason Claude can act on.",
       "category": "safety",
-      "tags": ["safety", "files", "guard"]
+      "tags": [
+        "safety",
+        "files",
+        "guard"
+      ]
     }
   ]
 }

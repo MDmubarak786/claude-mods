@@ -1,5 +1,7 @@
 # Roadmap: mods we want to merge
 
+Already in the catalog: [`fence`](../mods/fence/), [`circuit-breaker`](../mods/circuit-breaker/), [`ding`](../mods/ding/).
+
 Each entry names the pain it removes and the events and `$` calls that make it work, so you can start from a plan rather than a blank file. Claim one by opening a **Mod idea** issue that links here. Difficulty is a rough guess.
 
 None of these duplicate Anthropic's sample mods (`blast-radius`, `replay-theater`, `token-weather`) or the built-in `/diff` and `cc-plugin-you-should-know`.
@@ -11,14 +13,6 @@ None of these duplicate Anthropic's sample mods (`blast-radius`, `replay-theater
 **How.** `tool.call` on `Edit`, `Write`, and `Bash`. Scan `new_string`, `content`, and `command` for secret patterns (AWS, GitHub, Slack, Stripe, private key blocks, `.env` reads piped to the network). On a hit, hold the call with `$.ui.ask('This looks like a secret. Continue?', ['Refuse', 'Allow once'])`, default to refuse, and return `{ deny }` with the matched pattern's name so Claude rewrites the change. Fails closed under `claude -p`, where `$.ui.ask` rejects. Also hook `tool.call` on `Bash` for `git commit` and `git push` and run a quick scan of staged content with `$.process.run(['git', 'diff', '--cached'])`.
 
 **Difficulty.** Medium. The patterns are the whole product; start with ten high-precision ones.
-
-## `circuit-breaker` — end the doom loop
-
-**Pain.** Claude runs the same failing command five times in a row, burning tokens and your patience, while you're away from the keyboard.
-
-**How.** `tool.call` on `Bash` records `(command, isError)` per turn. When the same command fails N times, hold the next attempt with `$.ui.ask` or return `{ deny: 'This command has failed N times. Stop and explain what you think is wrong before trying again.' }`. A `turn.complete` hook resets the counter. Show the streak in the `Spinner` suffix so the user sees it building. `/breaker 3` sets the threshold via `$.store`.
-
-**Difficulty.** Low. Mostly bookkeeping. The deny text is what makes it work.
 
 ## `burn` — live cost and cache meter
 
@@ -43,14 +37,6 @@ None of these duplicate Anthropic's sample mods (`blast-radius`, `replay-theater
 **How.** `turn.complete` appends `{ cwd, repo, answer, durationMs, filesTouched }` to `$.store` under today's date. `/standup` reads the day (or `/standup 3` for three days) across every session on the machine, since `$.store` is shared, and asks `$.model.complete({ model: 'haiku', system: 'Write a three-bullet standup update', prompt })`. Optional `--md` writes to a path via `$.fs.write`. Prune entries older than a configurable number of days.
 
 **Difficulty.** Low to medium. Shared-store races are the only subtlety: use one key per session-day.
-
-## `ding` — know when Claude needs you
-
-**Pain.** You tab away during a long task and come back twenty minutes after Claude asked a question.
-
-**How.** `turn.complete` plays a sound with `$.audio.play` and, on macOS and Linux, posts a desktop notification through `$.process.run(['osascript', ...])` or `notify-send`. `tool.call` on `AskUserQuestion` fires a different sound. `userConfig` for sound choice and a quiet-hours window. `/ding off` for the session.
-
-**Difficulty.** Low. The hardest part is doing nothing when the terminal is focused, which `$.session.surfaces()` may help with.
 
 ## `gear` — a model and effort dial above the prompt
 

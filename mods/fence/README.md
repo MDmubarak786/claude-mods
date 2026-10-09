@@ -51,7 +51,7 @@ No environment variables, processes, or network. State lives in Claude Code's pl
 ## Limitations
 
 - It guards the Edit, Write, and NotebookEdit tools only. A Bash command such as `sed -i` or `echo > file` isn't checked. Pair it with a permission rule or a Bash guard if you need that.
-- Paths are compared as strings after resolving against the project root. A symlink that points outside the fence isn't followed.
+- Paths are normalized (`.` and `..` segments resolved, relative paths joined to the project root) and then compared as strings. Symlinks are not resolved, so a link inside the fence that points outside it is not caught. Use a permission `deny` rule for paths that must never change.
 - Subagents' edits are checked too, because `tool.call` fires for them. A subagent can't widen the fence; only `/fence` can.
 - This is a guardrail for the model, not a security boundary. A `deny` permission rule is the hard block.
 

@@ -86,3 +86,22 @@ test('the guard fails closed when the store cannot be read', async ($, on) => {
   const out = await $.tool.call(edit('/work/src/file.ts'))
   expect(out.deny).toMatch(/could not check this path/)
 })
+
+test('".." segments cannot escape the fence', async ($, on) => {
+  stubs(on, new Map([['fence:/work', ['/work/src']]]))
+  expect((await $.tool.call(edit('/work/src/../package.json'))).deny).toBeDefined()
+  expect((await $.tool.call(edit('/work/src/./a/../b.ts')))).toEqual({ result: 'edited' })
+})
+
+test('a relative tool path resolves against the project root', async ($, on) => {
+  stubs(on, new Map([['fence:/work', ['/work/src']]]))
+  expect(await $.tool.call(edit('src/a.ts'))).toEqual({ result: 'edited' })
+  expect((await $.tool.call(edit('../outside.ts'))).deny).toBeDefined()
+})
+
+test('/fence normalizes what the user typed', async ($, on) => {
+  const saved = new Map<string, unknown>()
+  stubs(on, saved)
+  await $.command.run({ command: 'fence', args: 'src/../lib/ ./docs//' })
+  expect(saved.get('fence:/work')).toEqual(['/work/lib', '/work/docs'])
+})

@@ -1,0 +1,4 @@
+{
+  "description": "The ding hooks module",
+  "modules": ["./register.ts"]
+}

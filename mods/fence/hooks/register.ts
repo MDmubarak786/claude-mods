@@ -11,21 +11,28 @@
 
 const USAGE = 'No fence set. Usage: /fence src/ docs/README.md    (or /fence off)'
 
-function trimSlashes(path: string): string {
-  return path.length > 1 ? path.replace(/\/+$/, '') : path
+// Resolve a path to an absolute, normalized form: no trailing slash, and no
+// "." or ".." segments, so "src/../package.json" compares as "package.json".
+function normalize(root: string, raw: string): string {
+  const absolute = raw.startsWith('/') ? raw : root + '/' + raw
+  const out: string[] = []
+  for (const part of absolute.split('/')) {
+    if (part === '' || part === '.') continue
+    if (part === '..') out.pop()
+    else out.push(part)
+  }
+  return '/' + out.join('/')
 }
 
 // Turn what the user typed into an absolute path under the project root.
 function resolveAllowed(root: string, typed: string): string | null {
   const path = typed.trim()
-  if (!path) return null
-  const absolute = path.startsWith('/') ? path : root + '/' + path.replace(/^\.\//, '')
-  return trimSlashes(absolute)
+  return path ? normalize(root, path) : null
 }
 
-function isInside(file: string, allowed: string[]): boolean {
-  const path = trimSlashes(file)
-  return allowed.some((dir) => path === dir || path.startsWith(dir + '/'))
+function isInside(root: string, file: string, allowed: string[]): boolean {
+  const path = normalize(root, file)
+  return allowed.some((dir) => path === dir || path.startsWith(dir === '/' ? '/' : dir + '/'))
 }
 
 function describe(allowed: unknown): string[] {
@@ -39,7 +46,7 @@ async function guard($, e, next) {
   if (allowed.length === 0) return next(e)
 
   const file = e.tool === 'NotebookEdit' ? e.notebook_path : e.file_path
-  if (typeof file !== 'string' || isInside(file, allowed)) return next(e)
+  if (typeof file !== 'string' || isInside(root, file, allowed)) return next(e)
 
   $.ui.log('refused an edit outside the fence: ' + file)
   return {

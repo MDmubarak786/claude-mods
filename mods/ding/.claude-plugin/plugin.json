@@ -1,0 +1,10 @@
+{
+  "name": "ding",
+  "version": "0.1.0",
+  "description": "Play a sound and post a desktop notification when Claude finishes a turn or needs you to answer a question or a permission prompt.",
+  "author": { "name": "Mohammed Mubarak" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/ding",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["mod"]
+}
