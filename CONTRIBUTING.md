@@ -6,7 +6,7 @@ Thanks for building a mod. This page is the whole process, start to finish.
 
 - Install Claude Code v2.1.287 or later and run `claude --version`.
 - Read the [mods overview](https://code.claude.com/docs/en/plugins/mods/overview) once. The [reference](https://code.claude.com/docs/en/plugins/mods/reference) lists every event and `$` method.
-- Check the [roadmap](docs/roadmap.md) and open issues so two people don't build the same thing. If your idea isn't listed, open a **Mod idea** issue first for a quick sanity check. It saves you from building something we can't merge.
+- Check the [roadmap](docs/roadmap.md), the [ecosystem survey](docs/ecosystem.md), and open issues so you don't build what exists or what someone else is building. If your idea isn't listed, open a **Mod idea** issue first for a quick sanity check. It saves you from building something we can't merge.
 
 ## Scaffold
 
