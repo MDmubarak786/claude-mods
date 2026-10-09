@@ -105,3 +105,14 @@ test('/fence normalizes what the user typed', async ($, on) => {
   await $.command.run({ command: 'fence', args: 'src/../lib/ ./docs//' })
   expect(saved.get('fence:/work')).toEqual(['/work/lib', '/work/docs'])
 })
+
+test('/fence on, status, or help explain the command instead of fencing a file by that name', async ($, on) => {
+  const saved = new Map<string, unknown>()
+  stubs(on, saved)
+  const out = await $.command.run({ command: 'fence', args: 'on' })
+  expect(out.text).toBe('To set a fence, name the paths: /fence src/ docs/README.md. To remove it: /fence off.')
+  expect(saved.has('fence:/work')).toBe(false)
+  await $.command.run({ command: 'fence', args: 'src' })
+  expect((await $.command.run({ command: 'fence', args: 'STATUS' })).text).toBe('Fence: /work/src. To set a fence, name the paths: /fence src/ docs/README.md. To remove it: /fence off.')
+  expect(saved.get('fence:/work')).toEqual(['/work/src'])
+})

@@ -24,6 +24,7 @@ claude --plugin-dir ./mods/fence
 | `/fence src/ docs/README.md` | Allow edits only under those paths. Relative paths resolve from the project root. |
 | `/fence` | Show the current fence. |
 | `/fence off` | Remove it. |
+| `/fence on`, `/fence status` | Show the current fence and how to set one. Words like these are never taken as paths. |
 
 The fence is saved per project root, so it's still there after you restart Claude Code. It runs immediately, even while Claude is working, so you can tighten it mid-turn.
 
