@@ -1,0 +1,56 @@
+name: Improve an existing mod
+description: A change to how a mod in this repository works.
+title: "[improvement] <mod>: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: dropdown
+    id: mod
+    attributes:
+      label: Which mod
+      options:
+        # mods:start
+        - big-output
+        - circuit-breaker
+        - copy-last
+        - ding
+        - fence
+        - mcp-diet
+        - memory-lint
+        - pins
+        - pkg-guard
+        - red-green
+        - right-tool
+        - show-paths
+        - standup
+        - style-cop
+        - tripwire
+        - trust-but-verify
+        - undo-agent
+        # mods:end
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What the mod does today that gets in your way, or what it can't do yet.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: The change you'd like
+      description: What it should do instead. If you know the event or `$` call involved, say so.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+      description: A setting, a permission rule, another mod, or a workaround.
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: Contributing
+      options:
+        - label: I'd like to send the pull request myself.
