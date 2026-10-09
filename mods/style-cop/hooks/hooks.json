@@ -1,0 +1,4 @@
+{
+  "description": "The style-cop hooks module",
+  "modules": ["./register.ts"]
+}

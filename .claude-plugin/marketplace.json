@@ -88,6 +88,18 @@
       ]
     },
     {
+      "name": "style-cop",
+      "source": "./mods/style-cop",
+      "description": "Enforce the style rules Claude keeps ignoring: banned words and phrases, a comment-density cap on added code, and files that must not gain comments. Rules live in .claude/style-cop.md and are both shown to Claude and enforced on edits.",
+      "category": "quality",
+      "tags": [
+        "style",
+        "comments",
+        "guard",
+        "prompt"
+      ]
+    },
+    {
       "name": "undo-agent",
       "source": "./mods/undo-agent",
       "description": "Undo the file edits a subagent made. /rewind restores your own turns, but not a subagent's edits; this snapshots them and puts the files back with one command.",
