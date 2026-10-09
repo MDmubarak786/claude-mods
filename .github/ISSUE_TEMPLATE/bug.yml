@@ -1,0 +1,36 @@
+name: Bug in a mod
+description: A mod here does the wrong thing, or nothing.
+labels: ["bug"]
+body:
+  - type: input
+    id: mod
+    attributes:
+      label: Mod and version
+      placeholder: fence 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: claude
+    attributes:
+      label: Claude Code version
+      description: Output of `claude --version`, or the Claude Code row of `/status` in the Desktop app.
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where you ran it
+      options:
+        - Terminal
+        - Desktop app (Code tab)
+        - VS Code extension
+        - claude -p or the SDK
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: What you did and what happened
+      description: Steps to reproduce, what you expected, and what you saw. If the mod did nothing, include the mods line from `/plugin` and anything the debug log says.
+    validations:
+      required: true

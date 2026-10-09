@@ -1,0 +1,4 @@
+# Each mod is owned by its author, so they're requested on pull requests that touch it.
+# scripts/new-mod.sh reminds you to add a line here.
+*                 @OWNER
+/mods/fence/      @OWNER

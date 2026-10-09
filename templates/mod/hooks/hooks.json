@@ -1,0 +1,4 @@
+{
+  "description": "The __NAME__ hooks module",
+  "modules": ["./register.ts"]
+}

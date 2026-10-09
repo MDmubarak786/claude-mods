@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Claude Code mods documentation
+    url: https://code.claude.com/docs/en/plugins/mods/overview
+    about: How mods work, every event and API method, and how to test one.
+  - name: Security report
+    url: https://github.com/OWNER/claude-mods/security/advisories/new
+    about: A mod here does something it shouldn't. Report it privately.
