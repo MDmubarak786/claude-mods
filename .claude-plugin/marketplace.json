@@ -7,6 +7,17 @@
   "description": "Community mods for Claude Code: guards, panes, and commands that run inside Claude Code itself.",
   "plugins": [
     {
+      "name": "big-output",
+      "source": "./mods/big-output",
+      "description": "Keep huge shell output out of the context window. A Bash result over a threshold is saved to a file and Claude gets its head and tail plus a slice tool to grep or page the rest on demand.",
+      "category": "context",
+      "tags": [
+        "context",
+        "bash",
+        "tokens"
+      ]
+    },
+    {
       "name": "circuit-breaker",
       "source": "./mods/circuit-breaker",
       "description": "Stop Claude from retrying the same failing shell command over and over. After N identical failures the next attempt is held, and you choose: stop, or try once more.",

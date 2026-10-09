@@ -1,6 +1,6 @@
 # Roadmap: mods we want to merge
 
-Already in the catalog: [`fence`](../mods/fence/), [`circuit-breaker`](../mods/circuit-breaker/), [`ding`](../mods/ding/), [`show-paths`](../mods/show-paths/), [`copy-last`](../mods/copy-last/), [`right-tool`](../mods/right-tool/), [`undo-agent`](../mods/undo-agent/), [`pkg-guard`](../mods/pkg-guard/), [`style-cop`](../mods/style-cop/).
+Already in the catalog: [`fence`](../mods/fence/), [`circuit-breaker`](../mods/circuit-breaker/), [`ding`](../mods/ding/), [`show-paths`](../mods/show-paths/), [`copy-last`](../mods/copy-last/), [`right-tool`](../mods/right-tool/), [`undo-agent`](../mods/undo-agent/), [`pkg-guard`](../mods/pkg-guard/), [`style-cop`](../mods/style-cop/), [`big-output`](../mods/big-output/), [`pins`](../mods/pins/).
 
 Every entry below starts from a problem developers have on record, names the closest mod that already exists so you can check it isn't enough, and says which events and `$` calls make it work. The list is ordered smallest first, because a one-hook fix for a 186-reaction annoyance is worth more than a framework. The [ecosystem survey](ecosystem.md) explains what we deliberately don't build.
 
@@ -8,31 +8,7 @@ Every entry below starts from a problem developers have on record, names the clo
 
 Claim one by opening a **Mod idea** issue that links here.
 
-## 1. `big-output` — keep huge tool output out of context
-
-**Pain.** One `npm test` or `cat package-lock.json` dumps 50 KB into the context window, and it stays there until compaction. Asked for explicitly in the launch thread.
-
-**What it does.** When a Bash result is larger than a threshold, the mod saves the full output to a file, hands Claude the first and last 40 lines plus a line saying where the rest is and how big it is, and registers a tool Claude can call to grep or slice the saved output on demand.
-
-**How.** `tool.call` on Bash: `const r = await next(e)`, then return a copy of `r` whose `result.stdout` is the trimmed text (the Bash result record is `{ stdout, stderr, interrupted }`, so rewriting `stdout` keeps the schema). `$.fs.write` to a temp path. `$.tool.register` for `slice` with `{ id, grep?, from?, to? }`, handled by a second `tool.call` hook on `mcp__big-output__slice`.
-
-**Nearest neighbour.** `micro-compaction` replaces old Read results with placeholders after the fact. Nothing trims at the moment of the call.
-
-**Size.** Medium. The threshold is a `userConfig` option.
-
-## 2. `pins` — instructions that survive compaction and `/clear`
-
-**Pain.** "Don't touch the migrations," said an hour ago, is gone after compaction. Rules ignored across session boundaries is the theme of [#69044](https://github.com/anthropics/claude-code/issues/69044).
-
-**What it does.** `/pin don't touch the migrations` saves an instruction for this project. Every prompt carries the pinned list as context Claude reads but the transcript doesn't show. Pins come back after compaction, `/clear`, and restart. `/pins` opens a pane to edit or drop them.
-
-**How.** `$.store` keyed by project root. `prompt.submit` adds `context: [...(e.context ?? []), pinnedText]`. `classic.SessionStart` with `source` `compact`, `clear`, or `resume` reloads them. A pane with `Input` and per-row delete buttons.
-
-**Nearest neighbour.** `context-canary` watches one sentinel and compacts; `pinboard` keeps decisions visible but doesn't feed them to Claude.
-
-**Size.** Small.
-
-## 3. `mcp-diet` — choose which MCP tools Claude sees, per project
+## 1. `mcp-diet` — choose which MCP tools Claude sees, per project
 
 **Pain.** Four MCP servers cost one developer 67,000 tokens before the first prompt. Tool search helps, but you can't say "in this repo, hide the Jira tools."
 
@@ -44,7 +20,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium.
 
-## 4. `memory-lint` — know whether your memory index loaded whole
+## 2. `memory-lint` — know whether your memory index loaded whole
 
 **Pain.** The auto-memory index is read at session start up to a limit, and a session can't tell whether it got the whole file, a truncated one, or nothing. A 65-comment thread asks for the threshold to be visible and configurable.
 
@@ -56,7 +32,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Tiny.
 
-## 5. `red-green` — tests run themselves after every turn
+## 3. `red-green` — tests run themselves after every turn
 
 **Pain.** Claude says "done", you run the tests, three fail, and you're back to prompting.
 
@@ -68,7 +44,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium.
 
-## 6. `standup` — your day, written for you
+## 4. `standup` — your day, written for you
 
 **Pain.** Writing the standup update, the changelog entry, or the end-of-day summary of what you and Claude actually did, across several repos.
 
@@ -80,7 +56,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Small to medium.
 
-## 7. `tripwire` — stop secrets leaving the machine
+## 5. `tripwire` — stop secrets leaving the machine
 
 **Pain.** Claude pastes a key into a file that's about to be committed, or runs `curl -d @.env`.
 
@@ -92,7 +68,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium.
 
-## 8. `trust-but-verify` — check what Claude claims against what it ran
+## 6. `trust-but-verify` — check what Claude claims against what it ran
 
 **Pain.** "Tests pass." No test command ran. "Verified in the browser." No browser tool was called. "This was approved earlier." It wasn't. [#69044](https://github.com/anthropics/claude-code/issues/69044) documents months of it.
 

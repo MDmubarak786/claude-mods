@@ -1,0 +1,10 @@
+{
+  "name": "big-output",
+  "version": "0.1.0",
+  "description": "Keep huge shell output out of the context window. A Bash result over a threshold is saved to a file and Claude gets its head and tail plus a slice tool to grep or page the rest on demand.",
+  "author": { "name": "Mohammed Mubarak" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/big-output",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["mod"]
+}
