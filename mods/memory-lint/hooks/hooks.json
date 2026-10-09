@@ -1,0 +1,4 @@
+{
+  "description": "The memory-lint hooks module",
+  "modules": ["./register.ts"]
+}

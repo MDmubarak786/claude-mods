@@ -74,6 +74,17 @@
       ]
     },
     {
+      "name": "memory-lint",
+      "source": "./mods/memory-lint",
+      "description": "Know whether your auto-memory index loaded whole. Reports the index's size against a limit you set at every session start, names the entries past the cut, and warns when a session pushes it over.",
+      "category": "context",
+      "tags": [
+        "memory",
+        "context",
+        "diagnostics"
+      ]
+    },
+    {
       "name": "pins",
       "source": "./mods/pins",
       "description": "Pin instructions that survive compaction, /clear, and restarts. /pin saves a rule for this project and every prompt carries the pinned list as context Claude reads.",

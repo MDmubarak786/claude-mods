@@ -1,0 +1,10 @@
+{
+  "name": "memory-lint",
+  "version": "0.1.0",
+  "description": "Know whether your auto-memory index loaded whole. Reports the index's size against a limit you set at every session start, names the entries past the cut, and warns when a session pushes it over.",
+  "author": { "name": "Mohammed Mubarak" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/memory-lint",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["mod"]
+}
