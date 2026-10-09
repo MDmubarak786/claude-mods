@@ -1,6 +1,6 @@
 import { expect, mock, test } from 'claude-code/testing'
 
-function stubs(on, options: { exitCode?: number; stdout?: string; files?: Record<string, string>; saved?: Map<string, unknown>; ran?: unknown[]; submitted?: string[] } = {}) {
+function stubs(on, options: { exitCode?: number; stdout?: string; files?: Record<string, string>; saved?: Map<string, unknown>; ran?: unknown[]; submitted?: string[]; answer?: string } = {}) {
   const saved = options.saved ?? new Map<string, unknown>()
   const files = options.files ?? {}
   on('session.root', () => ({ value: '/work' }))
@@ -22,7 +22,7 @@ function stubs(on, options: { exitCode?: number; stdout?: string; files?: Record
   on('command.register', () => ({ value: undefined }))
   on('session.start', () => ({ cwd: '/work' }))
   on('ui.log', () => ({ value: undefined }))
-  on('tool.call', () => ({ result: 'edited' }))
+  on('tool.call', ($, e) => (e.tool === 'AskUserQuestion' ? { result: { answers: { [e.questions[0].question]: options.answer ?? 'Skip' } } } : { result: 'edited' }))
   on('turn.complete', () => ({ text: '' }))
   return saved
 }
@@ -92,4 +92,28 @@ test('/fix with no failure says so', async ($, on) => {
   stubs(on)
   await start($)
   expect((await $.command.run({ command: 'fix', args: '' })).text).toBe('No failing test run to fix.')
+})
+
+test('an edit to a file that defines the tests asks first, and skips by default', async ($, on) => {
+  const ran: any[] = []
+  stubs(on, { ran, saved: new Map([['red-green:/work', { command: 'npm test', enabled: true }]]) })
+  await start($)
+  await $.tool.call({ tool: 'Edit', file_path: '/work/package.json', old_string: 'a', new_string: 'b' })
+  await $.tool.call(edit())
+  const out = await $.turn.complete(turn())
+  expect(out.text).toBe('red-green: skipped npm test because Claude changed package.json this turn. Review it, then run the tests yourself or ask Claude to.')
+  expect(ran).toEqual([])
+  // The next turn, with only source edits, runs as usual.
+  await $.tool.call(edit())
+  expect((await $.turn.complete(turn())).text).toMatch(/^red-green: tests passed/)
+})
+
+test('Run at the question runs the tests; a script named in the command counts as a definition', async ($, on) => {
+  const ran: any[] = []
+  stubs(on, { ran, answer: 'Run', saved: new Map([['red-green:/work', { command: 'sh scripts/test.sh', enabled: true }]]) })
+  await start($)
+  await $.tool.call({ tool: 'Write', file_path: '/work/scripts/test.sh', content: 'echo hi' })
+  const out = await $.turn.complete(turn())
+  expect(out.text).toMatch(/^red-green: tests passed/)
+  expect(ran[0].argv).toEqual(['sh', '-c', 'sh scripts/test.sh'])
 })

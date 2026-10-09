@@ -20,6 +20,18 @@ let settings: Settings = { command: '', enabled: true }
 let dirty = false
 let running = false
 let last: Result | null = null
+// Files Claude edited this turn, to notice when it changed what the test command runs.
+let edited = new Set<string>()
+
+// Files that define what a test command does. An edit to one of these this turn
+// means running the command would execute code Claude just wrote, without a
+// permission prompt, so the user is asked first.
+const DEFINES_TESTS = /(?:^|\/)(?:package\.json|Makefile|GNUmakefile|pyproject\.toml|setup\.cfg|setup\.py|conftest\.py|pytest\.ini|tox\.ini|Cargo\.toml|build\.rs|go\.mod|Rakefile|Gemfile|build\.gradle(?:\.kts)?|pom\.xml|\.mocharc[^/]*|(?:jest|vitest|karma|playwright|cypress|ava)\.config\.[^/]+|\.npmrc|\.yarnrc[^/]*)$/
+
+function changedTestDefinition(): string[] {
+  const named = settings.command.split(/\s+/).filter((w) => /[./]/.test(w) && !w.startsWith('-'))
+  return [...edited].filter((f) => DEFINES_TESTS.test(f) || named.some((n) => f === n || f.endsWith('/' + n)))
+}
 
 async function load($) {
   try {
@@ -146,13 +158,28 @@ export function register(on) {
 
   on('tool.call', { tool: ['Edit', 'Write', 'MultiEdit', 'NotebookEdit'] }, async ($, e, next) => {
     const result = await next(e)
-    if (typeof e.agentId !== 'string' && !result.deny && !result.isError) dirty = true
+    if (typeof e.agentId !== 'string' && !result.deny && !result.isError) {
+      dirty = true
+      const file = e.tool === 'NotebookEdit' ? e.notebook_path : e.file_path
+      if (typeof file === 'string') edited.add(root && file.startsWith(root + '/') ? file.slice(root.length + 1) : file)
+    }
     return result
   }).catch(async ($, e, next) => next(e))
 
   on('turn.complete', async ($, e, next) => {
     if (typeof e.agentId === 'string' || e.isAborted || !dirty || !settings.enabled || !settings.command || running) return next(e)
     dirty = false
+    const risky = changedTestDefinition()
+    edited = new Set()
+    if (risky.length) {
+      let answer = 'Skip'
+      try {
+        answer = await $.ui.ask('red-green: Claude changed ' + risky.join(', ') + ' this turn, which can change what `' + settings.command + '` runs. Run it anyway?', ['Skip', 'Run'])
+      } catch {
+        // Nobody to ask: skip.
+      }
+      if (answer !== 'Run') return { text: 'red-green: skipped ' + settings.command + ' because Claude changed ' + risky.join(', ') + ' this turn. Review it, then run the tests yourself or ask Claude to.' }
+    }
     running = true
     try {
       last = await run($)
