@@ -4,10 +4,12 @@
 //   /pkg-guard off     let every install through
 //   /pkg-guard on      turn it back on
 //
-// When Claude runs npm/pnpm/yarn/pip/uv/cargo install for a package that isn't
+// When Claude runs npm/pnpm/yarn/bun/pip/uv/cargo install for a package that isn't
 // already in the project's lockfile, the mod looks the package up on its
 // registry. A package that doesn't exist, is under 30 days old, or has very few
 // downloads is held with the facts in the question, and refused by default.
+// A package installed from a URL, a git repository, or a tarball can't be
+// checked against a registry, so it's held too.
 
 const MIN_AGE_DAYS = 30
 const MIN_WEEKLY_DOWNLOADS = 100
@@ -16,65 +18,128 @@ const CACHE_MS = 24 * 60 * 60 * 1000
 type Eco = 'npm' | 'pypi' | 'crates'
 type Facts = { exists: boolean; ageDays: number | null; weekly: number | null; repo: string | null }
 type Check = { eco: Eco; name: string; facts: Facts; reason: string | null }
+type Install = { eco: Eco; names: string[]; unverifiable: string[] }
 
 let enabled = true
 const checked: string[] = []
 
 const LOCKFILES: Record<Eco, string[]> = {
-  npm: ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'bun.lock', 'bun.lockb'],
+  npm: ['package-lock.json', 'pnpm-lock.yaml', 'yarn.lock', 'bun.lock'],
   pypi: ['uv.lock', 'poetry.lock', 'requirements.txt', 'Pipfile.lock'],
   crates: ['Cargo.lock'],
 }
 
+// Separators between simple commands: chains, pipes, background, newlines, and
+// command substitution, so an install hidden in `$(...)` or after `|` is seen.
+const SEPARATORS = /&&|\|\||;|\||&|\n|\$\(|`/
+// Prefixes that don't change what runs: sudo, env assignments, and wrappers.
+const PREFIX = /^(?:sudo|doas|env|command|exec|nohup|time|nice|xvfb-run)$|^[A-Za-z_][A-Za-z0-9_]*=\S*$/
+const REMOTE = /^(?:https?:|git\+|git@|github:|gitlab:|bitbucket:|ssh:|git:)/
+const LOCAL = /^(?:\.|\/|~|file:)/
+
 function tokens(command: string): string[] {
   const out: string[] = []
-  for (const m of command.trim().matchAll(/'([^']*)'|"([^"]*)"|(\S+)/g)) out.push(m[1] ?? m[2] ?? m[3])
-  return out
+  for (const m of command.trim().matchAll(/'([^']*)'|"([^"]*)"|(\S+)/g)) out.push((m[1] ?? m[2] ?? m[3]).replace(/[)`]+$/, ''))
+  return out.filter(Boolean)
 }
 
-// Returns the ecosystem and bare package names an install command adds, or null.
-function parseInstall(command: string): { eco: Eco; names: string[] } | null {
-  // Only the first simple command of a line is checked; chains are split and each part checked.
-  const t = tokens(command)
+// Returns the ecosystem and package names one simple command installs, or null.
+function parseInstall(part: string): Install | null {
+  let t = tokens(part)
+  while (t.length && PREFIX.test(t[0])) t = t.slice(1)
   if (t.length < 2) return null
+  // python -m pip install ...  and  py -m pip install ...
+  if (/^python[23]?(?:\.\d+)?$|^py$/.test(t[0]) && t[1] === '-m' && t[2] === 'pip') t = t.slice(2)
   const [cmd, sub, ...rest] = t
   let eco: Eco | null = null
   let args = rest
-  if ((cmd === 'npm' && ['install', 'i', 'add'].includes(sub)) || (cmd === 'pnpm' && ['add', 'install', 'i'].includes(sub)) || (cmd === 'yarn' && sub === 'add') || (cmd === 'bun' && ['add', 'install', 'i'].includes(sub))) eco = 'npm'
-  else if ((cmd === 'pip' || cmd === 'pip3') && sub === 'install') eco = 'pypi'
+  if ((cmd === 'npm' && ['install', 'i', 'add', 'in', 'ins', 'inst', 'isntall'].includes(sub)) || (cmd === 'pnpm' && ['add', 'install', 'i'].includes(sub)) || (cmd === 'yarn' && sub === 'add') || (cmd === 'bun' && ['add', 'install', 'i'].includes(sub)) || (cmd === 'npx' && sub === 'npm' && rest[0] === 'install')) {
+    eco = 'npm'
+    if (cmd === 'npx') args = rest.slice(1)
+  } else if ((cmd === 'pip' || cmd === 'pip3' || /^pip3?\.\d+$/.test(cmd)) && sub === 'install') eco = 'pypi'
   else if (cmd === 'uv' && sub === 'add') eco = 'pypi'
   else if (cmd === 'uv' && sub === 'pip' && rest[0] === 'install') { eco = 'pypi'; args = rest.slice(1) }
-  else if (cmd === 'cargo' && sub === 'add') eco = 'crates'
+  else if (cmd === 'pipx' && sub === 'install') eco = 'pypi'
+  else if (cmd === 'poetry' && sub === 'add') eco = 'pypi'
+  else if (cmd === 'cargo' && (sub === 'add' || sub === 'install')) eco = 'crates'
   if (!eco) return null
 
   const names: string[] = []
+  const unverifiable: string[] = []
   for (let i = 0; i < args.length; i++) {
     const a = args[i]
-    if (a === '-r' || a === '--requirement' || a === '-e' || a === '--editable') { i++; continue }
+    if (a === '--') continue
+    if (['-r', '--requirement', '-e', '--editable', '-c', '--constraint', '--index-url', '-i', '--extra-index-url', '--find-links', '-f', '--registry', '--git', '--path', '--index'].includes(a)) {
+      // A flag with a value: a git/URL source for cargo or pip is unverifiable.
+      const v = args[i + 1] ?? ''
+      if (['--git', '--index-url', '-i', '--extra-index-url', '--find-links', '-f', '--registry', '--index'].includes(a) && v) unverifiable.push(a + ' ' + v)
+      i++
+      continue
+    }
     if (a.startsWith('-')) continue
-    if (/^(\.|\/|~|file:|git\+|https?:|git@|github:)/.test(a) || a.endsWith('.whl') || a.endsWith('.tar.gz')) continue
-    names.push(bareName(eco, a))
+    if (LOCAL.test(a)) continue
+    if (REMOTE.test(a) || /\.(?:tgz|tar\.gz|zip|whl)$/.test(a) || a.includes('://')) {
+      unverifiable.push(a)
+      continue
+    }
+    const bare = bareName(eco, a)
+    if (bare === null) unverifiable.push(a)
+    else names.push(bare)
   }
-  return names.length ? { eco, names } : null
+  return names.length || unverifiable.length ? { eco, names, unverifiable } : null
 }
 
-function bareName(eco: Eco, spec: string): string {
+// The registry name behind a spec, or null when the spec can't be reduced to one.
+function bareName(eco: Eco, spec: string): string | null {
   if (eco === 'npm') {
-    // @scope/name@1.2.3 or name@^1
-    const at = spec.lastIndexOf('@')
-    return at > 0 ? spec.slice(0, at) : spec
+    // alias@npm:target@range  or  npm:target@range
+    let s = spec
+    const alias = /^[^@]+@npm:(.+)$/.exec(s) ?? /^npm:(.+)$/.exec(s)
+    if (alias) s = alias[1]
+    if (/@(?:git|https?|file|github|npm):/.test(s) || s.includes('://')) return null
+    const at = s.lastIndexOf('@')
+    const name = at > 0 ? s.slice(0, at) : s
+    return /^(?:@[a-z0-9][\w.-]*\/)?[a-z0-9][\w.-]*$/i.test(name) ? name : null
   }
-  if (eco === 'pypi') return spec.split(/[\[<>=!~;@ ]/)[0].toLowerCase().replace(/_/g, '-')
-  return spec.split('@')[0]
+  if (eco === 'pypi') {
+    if (spec.includes('@') || spec.includes('://')) return null
+    const name = spec.split(/[\[<>=!~; ]/)[0]
+    return /^[A-Za-z0-9][\w.-]*$/.test(name) ? name.toLowerCase().replace(/[_.]/g, '-') : null
+  }
+  const name = spec.split('@')[0]
+  return /^[A-Za-z0-9][\w-]*$/.test(name) ? name : null
+}
+
+function escapeRe(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+// Whether a lockfile lists exactly this package, as a whole token in the format's
+// own syntax: "requests-oauthlib" in a lockfile never vouches for "requests".
+function lockfileHas(eco: Eco, file: string, text: string, name: string): boolean {
+  const n = escapeRe(name)
+  if (eco === 'npm') {
+    if (file === 'package-lock.json') return new RegExp('"node_modules/' + n + '"\\s*:').test(text)
+    if (file === 'pnpm-lock.yaml') return new RegExp('^\\s*[\'"]?/?' + n + '@[^\\n]*:\\s*$', 'm').test(text)
+    if (file === 'yarn.lock') return new RegExp('^"?' + n + '@', 'm').test(text)
+    if (file === 'bun.lock') return new RegExp('^\\s*"' + n + '"\\s*:', 'm').test(text)
+    return false
+  }
+  if (eco === 'pypi') {
+    // PyPI names compare with -, _, and . as the same character.
+    const loose = n.replace(/\\\.|[-_]/g, '[-_.]')
+    if (file === 'requirements.txt') return new RegExp('^\\s*' + loose + '\\s*(?:[=<>!~\\[;@ ]|$)', 'mi').test(text)
+    if (file === 'Pipfile.lock') return new RegExp('^\\s*"' + loose + '"\\s*:', 'mi').test(text)
+    return new RegExp('^name = "' + loose + '"\\s*$', 'mi').test(text)
+  }
+  return new RegExp('^name = "' + n + '"\\s*$', 'm').test(text)
 }
 
 async function inLockfile($, eco: Eco, name: string): Promise<boolean> {
   for (const file of LOCKFILES[eco]) {
     try {
       if (!(await $.fs.exists(file))) continue
-      const text = await $.fs.read(file)
-      const needle = eco === 'npm' ? 'node_modules/' + name + '"' : eco === 'crates' ? 'name = "' + name + '"' : name
-      if (text.toLowerCase().includes(needle.toLowerCase())) return true
+      if (lockfileHas(eco, file, await $.fs.read(file), name)) return true
     } catch {
       // A lockfile too large to read counts as unknown: the registry decides.
     }
@@ -158,33 +223,34 @@ async function check($, eco: Eco, name: string): Promise<Check> {
   return { eco, name, facts, reason: judge(facts) }
 }
 
+function installsIn(command: string): Install[] {
+  return command.split(SEPARATORS).map(parseInstall).filter((x): x is Install => x !== null)
+}
+
 async function guard($, e, next) {
   if (!enabled) return next(e)
-  // Check each simple command in a chain.
-  const parts = e.command.split(/&&|;|\|\|/)
-  const suspects: Check[] = []
-  for (const part of parts) {
-    const install = parseInstall(part)
-    if (!install) continue
+  const reasons: string[] = []
+  for (const install of installsIn(String(e.command ?? ''))) {
+    for (const spec of install.unverifiable) reasons.push(install.eco + ' install of "' + spec + '" comes from a URL, git, or an index that can\'t be checked against the registry')
     for (const name of install.names) {
       if (await inLockfile($, install.eco, name)) continue
       const c = await check($, install.eco, name)
       checked.push(describe(c))
-      if (c.reason) suspects.push(c)
+      if (c.reason) reasons.push(describe(c))
     }
   }
-  if (!suspects.length) return next(e)
+  if (!reasons.length) return next(e)
 
   let answer = 'Refuse'
   try {
-    answer = await $.ui.ask('pkg-guard: ' + suspects.map(describe).join('; ') + '. Install anyway?', ['Refuse', 'Install'])
+    answer = await $.ui.ask('pkg-guard: ' + reasons.join('; ') + '. Install anyway?', ['Refuse', 'Install'])
   } catch {
     // Nobody to ask: refuse.
   }
   if (answer !== 'Install') {
     return {
       deny:
-        'pkg-guard: this install was refused. ' + suspects.map(describe).join('. ') + '. ' +
+        'pkg-guard: this install was refused. ' + reasons.join('. ') + '. ' +
         'Check the exact package name on the registry before trying again, prefer a well-known package, or ask the user.',
     }
   }
@@ -218,7 +284,7 @@ export function register(on) {
 
   on('tool.call', { tool: 'Bash' }, guard).catch(async ($, e, next) => {
     if (next.called) return next(e)
-    if (!parseInstall(e.command) && !e.command.split(/&&|;|\|\|/).some((p) => parseInstall(p))) return next(e)
+    if (!installsIn(String(e.command ?? '')).length) return next(e)
     return { deny: 'pkg-guard: could not check this install (' + next.error.kind + '), so it was not run. Try again, or ask the user to run /pkg-guard off.' }
   })
 }

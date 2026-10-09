@@ -27,6 +27,8 @@ When Claude runs an install for a package that isn't in the project's lockfile, 
 | PyPI (`pip install`, `uv add`, `uv pip install`) | `pypi.org`, `pypistats.org` | first upload date, weekly downloads, source URL |
 | crates.io (`cargo add`) | `crates.io` | creation date, recent downloads |
 
+A package installed from a URL, a git repository, a tarball, or a custom index can't be checked against a registry, so it is held too; a local path is not. An npm alias (`name@npm:target`) is checked by its target. Installs behind `sudo`, environment assignments, `python -m pip`, a pipe, or a `$(...)` substitution are all seen.
+
 An established package installs silently; `/pkg-guard` lists what was checked. A suspect one opens Claude Code's question dialog:
 
 ```text
@@ -53,7 +55,7 @@ calls: $.command.register, $.fs.exists (via inLockfile), $.fs.read (via inLockfi
 ```
 
 - **`$.http.fetch`** sends only the package name to the public registries listed above, over HTTPS, and only for a package that isn't in your lockfile. Nothing else leaves the machine.
-- **`$.fs.read`** reads lockfiles in the working directory to skip known packages.
+- **`$.fs.read`** reads lockfiles in the working directory to skip known packages. A lockfile vouches for a package only when it lists that exact name in the file's own syntax, never when the name appears as a substring of another package or in a comment.
 - **`$.store`** keeps a day's cache of registry answers and the on/off flag.
 
 **Failure policy.** This is a guard, so if the registry can't be reached or the hook fails, an install is refused with a reason rather than let through.
