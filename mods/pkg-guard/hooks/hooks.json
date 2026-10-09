@@ -1,0 +1,4 @@
+{
+  "description": "The pkg-guard hooks module",
+  "modules": ["./register.ts"]
+}

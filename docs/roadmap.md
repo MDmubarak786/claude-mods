@@ -1,6 +1,6 @@
 # Roadmap: mods we want to merge
 
-Already in the catalog: [`fence`](../mods/fence/), [`circuit-breaker`](../mods/circuit-breaker/), [`ding`](../mods/ding/), [`show-paths`](../mods/show-paths/), [`copy-last`](../mods/copy-last/), [`right-tool`](../mods/right-tool/), [`undo-agent`](../mods/undo-agent/).
+Already in the catalog: [`fence`](../mods/fence/), [`circuit-breaker`](../mods/circuit-breaker/), [`ding`](../mods/ding/), [`show-paths`](../mods/show-paths/), [`copy-last`](../mods/copy-last/), [`right-tool`](../mods/right-tool/), [`undo-agent`](../mods/undo-agent/), [`pkg-guard`](../mods/pkg-guard/), [`style-cop`](../mods/style-cop/).
 
 Every entry below starts from a problem developers have on record, names the closest mod that already exists so you can check it isn't enough, and says which events and `$` calls make it work. The list is ordered smallest first, because a one-hook fix for a 186-reaction annoyance is worth more than a framework. The [ecosystem survey](ecosystem.md) explains what we deliberately don't build.
 
@@ -8,31 +8,7 @@ Every entry below starts from a problem developers have on record, names the clo
 
 Claim one by opening a **Mod idea** issue that links here.
 
-## 1. `pkg-guard` — hold installs of packages Claude guessed
-
-**Pain.** Claude runs `npm install some-helper` for a package name it inferred. Typosquats and hallucinated packages are a documented supply-chain vector.
-
-**What it does.** Holds `npm install`, `pnpm add`, `yarn add`, `pip install`, `uv add`, and `cargo add` when a package is not in the lockfile already. Looks it up on the registry, and asks before installing anything that doesn't exist, is under 30 days old, or has very few downloads. Shows name, age, weekly downloads, and repository link in the question.
-
-**How.** `tool.call` on Bash, a parser for the six install forms, `$.http.fetch` to the npm, PyPI, or crates.io JSON API, `$.ui.ask` with "Install" and "Refuse," default refuse. Fail closed. Cache lookups in `$.store` for a day.
-
-**Nearest neighbour.** `launch-codes` and `blast-radius` hold destructive commands. Nothing checks what's being installed.
-
-**Size.** Small. Why it spreads: a security story with a concrete screenshot.
-
-## 2. `style-cop` — enforce the style rules Claude keeps ignoring
-
-**Pain.** Verbose code comments by default, ignoring instructions to stop (250 reactions, the most-reacted model-behaviour issue). "Load-bearing" in every reply (181 reactions). Instructions in CLAUDE.md don't hold.
-
-**What it does.** A `~/.claude/style-cop.md` or project `.claude/style-cop.md` holds rules: banned words and phrases, a maximum comment density for added code, and file patterns that must not gain comments. The mod adds the rules as a system prompt section so Claude sees them every request, and enforces the measurable ones on Edit and Write: an edit whose added lines are more than N% comments is refused with the count, and a banned word in added code is refused with the line.
-
-**How.** `prompt.section` or `prompt.compose` for the rule text. `tool.call` on Edit and Write, a comment-line counter by file extension, `{ deny }` naming the violation. `/style-cop` shows the active rules and the count of refusals.
-
-**Nearest neighbour.** None.
-
-**Size.** Small to medium. Keep enforcement to what can be counted; leave taste to the prompt section.
-
-## 3. `big-output` — keep huge tool output out of context
+## 1. `big-output` — keep huge tool output out of context
 
 **Pain.** One `npm test` or `cat package-lock.json` dumps 50 KB into the context window, and it stays there until compaction. Asked for explicitly in the launch thread.
 
@@ -44,7 +20,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium. The threshold is a `userConfig` option.
 
-## 4. `pins` — instructions that survive compaction and `/clear`
+## 2. `pins` — instructions that survive compaction and `/clear`
 
 **Pain.** "Don't touch the migrations," said an hour ago, is gone after compaction. Rules ignored across session boundaries is the theme of [#69044](https://github.com/anthropics/claude-code/issues/69044).
 
@@ -56,7 +32,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Small.
 
-## 5. `mcp-diet` — choose which MCP tools Claude sees, per project
+## 3. `mcp-diet` — choose which MCP tools Claude sees, per project
 
 **Pain.** Four MCP servers cost one developer 67,000 tokens before the first prompt. Tool search helps, but you can't say "in this repo, hide the Jira tools."
 
@@ -68,7 +44,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium.
 
-## 6. `memory-lint` — know whether your memory index loaded whole
+## 4. `memory-lint` — know whether your memory index loaded whole
 
 **Pain.** The auto-memory index is read at session start up to a limit, and a session can't tell whether it got the whole file, a truncated one, or nothing. A 65-comment thread asks for the threshold to be visible and configurable.
 
@@ -80,7 +56,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Tiny.
 
-## 7. `red-green` — tests run themselves after every turn
+## 5. `red-green` — tests run themselves after every turn
 
 **Pain.** Claude says "done", you run the tests, three fail, and you're back to prompting.
 
@@ -92,7 +68,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium.
 
-## 8. `standup` — your day, written for you
+## 6. `standup` — your day, written for you
 
 **Pain.** Writing the standup update, the changelog entry, or the end-of-day summary of what you and Claude actually did, across several repos.
 
@@ -104,7 +80,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Small to medium.
 
-## 9. `tripwire` — stop secrets leaving the machine
+## 7. `tripwire` — stop secrets leaving the machine
 
 **Pain.** Claude pastes a key into a file that's about to be committed, or runs `curl -d @.env`.
 
@@ -116,7 +92,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium.
 
-## 10. `trust-but-verify` — check what Claude claims against what it ran
+## 8. `trust-but-verify` — check what Claude claims against what it ran
 
 **Pain.** "Tests pass." No test command ran. "Verified in the browser." No browser tool was called. "This was approved earlier." It wasn't. [#69044](https://github.com/anthropics/claude-code/issues/69044) documents months of it.
 

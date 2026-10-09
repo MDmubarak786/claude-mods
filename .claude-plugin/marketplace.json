@@ -51,6 +51,20 @@
       ]
     },
     {
+      "name": "pkg-guard",
+      "source": "./mods/pkg-guard",
+      "description": "Hold npm, pnpm, yarn, pip, uv, and cargo installs of packages that don't exist, are brand new, or are barely downloaded, with the registry facts in the question. Catches hallucinated and typosquat packages before they land.",
+      "category": "safety",
+      "tags": [
+        "safety",
+        "supply-chain",
+        "npm",
+        "pip",
+        "cargo",
+        "guard"
+      ]
+    },
+    {
       "name": "right-tool",
       "source": "./mods/right-tool",
       "description": "Stop Claude using cat, grep, find, and sed in Bash when the Read, Grep, and Glob tools fit. Each redirected call saves a permission prompt and keeps raw shell output out of context.",
