@@ -1,0 +1,11 @@
+{
+  "name": "watchtower",
+  "version": "0.1.0",
+  "description": "One line above the prompt showing what your guard mods are doing: the fence, pins, the breaker threshold, the test command and its last result, and every call refused this session.",
+  "author": { "name": "Mohammed Mubarak" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/watchtower",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["mod", "band", "status", "guards"],
+  "types": "./types/index.d.ts"
+}

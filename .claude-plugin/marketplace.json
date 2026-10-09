@@ -201,6 +201,18 @@
         "undo",
         "safety"
       ]
+    },
+    {
+      "name": "watchtower",
+      "source": "./mods/watchtower",
+      "description": "One line above the prompt showing what your guard mods are doing: the fence, pins, the breaker threshold, the test command and its last result, and every call refused this session.",
+      "category": "ui",
+      "tags": [
+        "band",
+        "status",
+        "guards",
+        "ui"
+      ]
     }
   ]
 }

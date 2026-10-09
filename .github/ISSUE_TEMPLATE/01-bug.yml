@@ -30,6 +30,7 @@ body:
         - tripwire
         - trust-but-verify
         - undo-agent
+        - watchtower
         # mods:end
     validations:
       required: true
