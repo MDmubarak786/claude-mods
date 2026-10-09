@@ -1,0 +1,4 @@
+{
+  "description": "The red-green hooks module",
+  "modules": ["./register.ts"]
+}

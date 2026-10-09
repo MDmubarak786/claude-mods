@@ -1,6 +1,6 @@
 # Roadmap: mods we want to merge
 
-Already in the catalog: [`fence`](../mods/fence/), [`circuit-breaker`](../mods/circuit-breaker/), [`ding`](../mods/ding/), [`show-paths`](../mods/show-paths/), [`copy-last`](../mods/copy-last/), [`right-tool`](../mods/right-tool/), [`undo-agent`](../mods/undo-agent/), [`pkg-guard`](../mods/pkg-guard/), [`style-cop`](../mods/style-cop/), [`big-output`](../mods/big-output/), [`pins`](../mods/pins/), [`mcp-diet`](../mods/mcp-diet/), [`memory-lint`](../mods/memory-lint/).
+Already in the catalog: [`fence`](../mods/fence/), [`circuit-breaker`](../mods/circuit-breaker/), [`ding`](../mods/ding/), [`show-paths`](../mods/show-paths/), [`copy-last`](../mods/copy-last/), [`right-tool`](../mods/right-tool/), [`undo-agent`](../mods/undo-agent/), [`pkg-guard`](../mods/pkg-guard/), [`style-cop`](../mods/style-cop/), [`big-output`](../mods/big-output/), [`pins`](../mods/pins/), [`mcp-diet`](../mods/mcp-diet/), [`memory-lint`](../mods/memory-lint/), [`red-green`](../mods/red-green/), [`standup`](../mods/standup/).
 
 Every entry below starts from a problem developers have on record, names the closest mod that already exists so you can check it isn't enough, and says which events and `$` calls make it work. The list is ordered smallest first, because a one-hook fix for a 186-reaction annoyance is worth more than a framework. The [ecosystem survey](ecosystem.md) explains what we deliberately don't build.
 
@@ -8,31 +8,7 @@ Every entry below starts from a problem developers have on record, names the clo
 
 Claim one by opening a **Mod idea** issue that links here.
 
-## 1. `red-green` — tests run themselves after every turn
-
-**Pain.** Claude says "done", you run the tests, three fail, and you're back to prompting.
-
-**What it does.** Marks a turn dirty on any edit, runs the project's test command at `turn.complete`, prints pass or fail under Claude's answer, and offers a one-key **Ask Claude to fix** button that submits the failures.
-
-**How.** `tool.call` on Edit and Write sets the flag. `turn.complete` runs `$.process.run` with the command from `/red-green <cmd>` or detected from `package.json`, `pyproject.toml`, or `Makefile`, with `timeoutMs` and `next.signal`. Returns `{ text }`. The button calls `$.prompt.submit({ text })`.
-
-**Nearest neighbour.** `test-ledger` and `boss-fight` observe the test commands Claude runs. Nothing runs them for you.
-
-**Size.** Medium.
-
-## 2. `standup` — your day, written for you
-
-**Pain.** Writing the standup update, the changelog entry, or the end-of-day summary of what you and Claude actually did, across several repos.
-
-**What it does.** Logs each turn's repo, files touched, and answer to the shared store. `/standup` reads today across every session on the machine and asks Haiku for a three-bullet update. `/standup 3` covers three days. `--md` writes it to a file.
-
-**How.** `turn.complete` to `$.store` under one key per session-day (avoids the shared-store race). `$.model.complete` with `model: 'haiku'`. `$.fs.write` for the file. Prune after a configurable number of days.
-
-**Nearest neighbour.** `session-wrapped` makes a recap card for one session. `handoff-notes` is manual.
-
-**Size.** Small to medium.
-
-## 3. `tripwire` — stop secrets leaving the machine
+## 1. `tripwire` — stop secrets leaving the machine
 
 **Pain.** Claude pastes a key into a file that's about to be committed, or runs `curl -d @.env`.
 
@@ -44,7 +20,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium.
 
-## 4. `trust-but-verify` — check what Claude claims against what it ran
+## 2. `trust-but-verify` — check what Claude claims against what it ran
 
 **Pain.** "Tests pass." No test command ran. "Verified in the browser." No browser tool was called. "This was approved earlier." It wasn't. [#69044](https://github.com/anthropics/claude-code/issues/69044) documents months of it.
 

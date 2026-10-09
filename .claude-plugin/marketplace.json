@@ -110,6 +110,17 @@
       ]
     },
     {
+      "name": "red-green",
+      "source": "./mods/red-green",
+      "description": "Run the project's tests after any turn that edited files, print pass or fail under Claude's answer, and send the failure back to Claude with one /fix command.",
+      "category": "workflow",
+      "tags": [
+        "tests",
+        "workflow",
+        "quality"
+      ]
+    },
+    {
       "name": "right-tool",
       "source": "./mods/right-tool",
       "description": "Stop Claude using cat, grep, find, and sed in Bash when the Read, Grep, and Glob tools fit. Each redirected call saves a permission prompt and keeps raw shell output out of context.",
