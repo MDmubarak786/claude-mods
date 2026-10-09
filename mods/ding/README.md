@@ -2,7 +2,7 @@
 
 A sound and a desktop notification when Claude finishes a turn or needs you. Two different sounds, so from across the room you know whether to come back now (Claude is asking a question or waiting on a permission prompt) or whenever (the turn is done).
 
-Claude Code's own notification setting covers "done" in the terminal. This adds the "needs you" case, which is the one that costs you twenty minutes, and reaches you outside the terminal.
+Claude Code's own `preferredNotifChannel` setting already gives you a bell or a desktop notification when a turn completes. What it doesn't do is tell you that Claude is waiting on an answer or a permission prompt, which is the case that costs you twenty minutes. ding adds that, with a different sound so you can tell the two apart, and puts the first line of the answer or the question in the notification.
 
 ## Install
 
