@@ -62,6 +62,17 @@
       ]
     },
     {
+      "name": "pins",
+      "source": "./mods/pins",
+      "description": "Pin instructions that survive compaction, /clear, and restarts. /pin saves a rule for this project and every prompt carries the pinned list as context Claude reads.",
+      "category": "context",
+      "tags": [
+        "context",
+        "compaction",
+        "instructions"
+      ]
+    },
+    {
       "name": "pkg-guard",
       "source": "./mods/pkg-guard",
       "description": "Hold npm, pnpm, yarn, pip, uv, and cargo installs of packages that don't exist, are brand new, or are barely downloaded, with the registry facts in the question. Catches hallucinated and typosquat packages before they land.",
