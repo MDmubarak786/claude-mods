@@ -1,0 +1,4 @@
+{
+  "description": "The trust-but-verify hooks module",
+  "modules": ["./register.ts"]
+}

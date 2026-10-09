@@ -179,6 +179,18 @@
       ]
     },
     {
+      "name": "trust-but-verify",
+      "source": "./mods/trust-but-verify",
+      "description": "Check what Claude claims against what it ran. When an answer says the tests pass, the build is clean, or something was committed, a line under it says whether a matching command actually ran this turn and succeeded.",
+      "category": "quality",
+      "tags": [
+        "quality",
+        "claims",
+        "tests",
+        "transcript"
+      ]
+    },
+    {
       "name": "undo-agent",
       "source": "./mods/undo-agent",
       "description": "Undo the file edits a subagent made. /rewind restores your own turns, but not a subagent's edits; this snapshots them and puts the files back with one command.",
