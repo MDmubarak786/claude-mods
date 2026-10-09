@@ -39,31 +39,38 @@ async function snapshot($, e, next) {
   const g = group(agentId)
   if (!g.entries.some((x) => x.file === file) && !g.skipped.includes(file)) {
     let exists = false
-    let size = 0
     try {
-      const stat = await $.fs.stat(file)
-      exists = stat.kind === 'file'
-      size = stat.size
+      exists = await $.fs.exists(file)
     } catch {
-      exists = false
-    }
-    if (exists && size > MAX_FILE) {
+      // Can't tell whether it exists: don't snapshot, and never treat it as created.
       g.skipped.push(file)
-    } else {
-      let content: string | null = null
-      if (exists) {
-        try {
-          content = await $.fs.read(file)
-        } catch {
-          g.skipped.push(file)
-          return next(e)
-        }
-        const target = scratch + '/' + (++counter) + '.pre'
-        await $.fs.write(target, content)
-        g.entries.push({ file, snapshot: target, created: false })
-      } else {
-        g.entries.push({ file, snapshot: null, created: true })
+      return next(e)
+    }
+    if (exists) {
+      let stat
+      try {
+        stat = await $.fs.stat(file, { resolve: false })
+      } catch {
+        g.skipped.push(file)
+        return next(e)
       }
+      // A symlink or directory is not snapshotted: restoring through a link would write to its target.
+      if (stat.kind !== 'file' || stat.size > MAX_FILE) {
+        g.skipped.push(file)
+        return next(e)
+      }
+      let content: string
+      try {
+        content = await $.fs.read(file)
+      } catch {
+        g.skipped.push(file)
+        return next(e)
+      }
+      const target = scratch + '/' + (++counter) + '.pre'
+      await $.fs.write(target, content)
+      g.entries.push({ file, snapshot: target, created: false })
+    } else {
+      g.entries.push({ file, snapshot: null, created: true })
     }
   }
   return next(e)
@@ -73,8 +80,18 @@ async function restore($, g: Group): Promise<string> {
   const lines: string[] = []
   for (const entry of g.entries) {
     try {
+      let kind = 'missing'
+      try {
+        if (await $.fs.exists(entry.file)) kind = (await $.fs.stat(entry.file, { resolve: false })).kind
+      } catch {
+        kind = 'unknown'
+      }
+      if (kind !== 'file' && kind !== 'missing') {
+        lines.push('skipped ' + entry.file + ' (it is now a link, a directory, or unreadable)')
+        continue
+      }
       if (entry.created) {
-        await $.process.run(['rm', '-f', '--', entry.file])
+        if (kind === 'file') await $.process.run(['rm', '-f', '--', entry.file])
         lines.push('removed ' + entry.file)
       } else if (entry.snapshot) {
         await $.fs.write(entry.file, await $.fs.read(entry.snapshot))
@@ -84,7 +101,7 @@ async function restore($, g: Group): Promise<string> {
       lines.push('could not restore ' + entry.file + ': ' + error)
     }
   }
-  for (const file of g.skipped) lines.push('skipped ' + file + ' (over 4 MiB, not snapshotted)')
+  for (const file of g.skipped) lines.push('skipped ' + file + ' (not snapshotted: a link, a directory, unreadable, or over 4 MiB)')
   groups.delete(g.agentId)
   return lines.join('\n')
 }
@@ -141,6 +158,13 @@ export function register(on) {
     }
     const g = args === 'last' ? all[0] : groups.get(args)
     if (!g || !g.entries.length) return { text: 'No snapshots for ' + (args === 'last' ? 'any agent' : args) + '. /undo-agent lists them.' }
+    let answer = 'Cancel'
+    try {
+      answer = await $.ui.ask('Put back ' + g.entries.length + ' file(s) changed by agent ' + g.agentId + '? This overwrites their current content.', ['Cancel', 'Restore'])
+    } catch {
+      // Dismissed, or nobody to ask.
+    }
+    if (answer !== 'Restore') return { text: 'Nothing restored.' }
     return { text: 'Undid agent ' + g.agentId + ':\n' + (await restore($, g)) }
   }).catch(async () => ({ text: 'undo-agent: the command failed. Nothing was restored.' }))
 }

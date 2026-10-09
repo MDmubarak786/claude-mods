@@ -1,6 +1,6 @@
 {
   "name": "undo-agent",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Undo the file edits a subagent made. /rewind restores your own turns, but not a subagent's edits; this snapshots them and puts the files back with one command.",
   "author": { "name": "Mohammed Mubarak" },
   "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/undo-agent",

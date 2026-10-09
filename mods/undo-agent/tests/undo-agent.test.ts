@@ -1,14 +1,19 @@
 import { expect, test } from 'claude-code/testing'
 
 // A fake file system: a Map of path -> content, plus the processes the mod ran.
-function stubs(on, files: Map<string, string>, ran: string[][] = []) {
+function stubs(on, files: Map<string, string>, ran: string[][] = [], options: { answer?: string; links?: string[]; unstattable?: string[] } = {}) {
   on('process.run', ($, e) => {
     ran.push(e.argv)
     if (e.argv[0] === 'mktemp') return { value: { exitCode: 0, stdout: '/scratch\n', stderr: '' } }
     if (e.argv[0] === 'rm') files.delete(e.argv[e.argv.length - 1])
     return { value: { exitCode: 0, stdout: '', stderr: '' } }
   })
-  on('fs.stat', ($, e) => (files.has(e.path) ? { value: { kind: 'file', size: files.get(e.path)!.length } } : { deny: 'no such file' }))
+  on('fs.exists', ($, e) => ({ value: files.has(e.path) || (options.links ?? []).includes(e.path) || (options.unstattable ?? []).includes(e.path) }))
+  on('fs.stat', ($, e) => {
+    if ((options.unstattable ?? []).includes(e.path)) return { deny: 'permission denied' }
+    if ((options.links ?? []).includes(e.path)) return { value: { kind: 'other', size: 0, mtimeMs: 0 } }
+    return files.has(e.path) ? { value: { kind: 'file', size: files.get(e.path)!.length, mtimeMs: 0 } } : { deny: 'no such file' }
+  })
   on('fs.read', ($, e) => (files.has(e.path) ? { value: files.get(e.path) } : { deny: 'no such file' }))
   on('fs.write', ($, e) => {
     files.set(e.path, e.text)
@@ -20,6 +25,7 @@ function stubs(on, files: Map<string, string>, ran: string[][] = []) {
   on('turn.complete', () => ({ text: '' }))
   // The edit itself: apply it to the fake file system.
   on('tool.call', ($, e) => {
+    if (e.tool === 'AskUserQuestion') return { result: { answers: { [e.questions[0].question]: options.answer ?? 'Restore' } } }
     if (e.tool === 'Write') files.set(e.file_path, e.content)
     if (e.tool === 'Edit') files.set(e.file_path, (files.get(e.file_path) ?? '').replace(e.old_string, e.new_string))
     return { result: 'edited' }
@@ -84,4 +90,37 @@ test('an unknown agent is reported', async ($, on) => {
   stubs(on, new Map())
   await start($)
   expect((await $.command.run({ command: 'undo-agent', args: 'nope' })).text).toMatch(/^No snapshots for nope/)
+})
+
+test('a file whose check failed is never treated as created, so it is never removed', async ($, on) => {
+  const files = new Map([['/work/keep.ts', 'precious']])
+  const ran: string[][] = []
+  stubs(on, files, ran, { unstattable: ['/work/keep.ts'] })
+  await start($)
+  await $.tool.call(write('/work/keep.ts', 'changed', 'agent-1'))
+  const out = await $.command.run({ command: 'undo-agent', args: 'last' })
+  expect(out.text).toBe('No snapshots for any agent. /undo-agent lists them.')
+  expect(ran.some((argv) => argv[0] === 'rm')).toBe(false)
+  expect(files.get('/work/keep.ts')).toBe('changed')
+})
+
+test('a symlink is not snapshotted or restored through', async ($, on) => {
+  const files = new Map([['/work/a.ts', 'a']])
+  stubs(on, files, [], { links: ['/work/link.ts'] })
+  await start($)
+  await $.tool.call(write('/work/link.ts', 'x', 'agent-1'))
+  await $.tool.call(write('/work/a.ts', 'A', 'agent-1'))
+  const out = await $.command.run({ command: 'undo-agent', args: 'last' })
+  expect(out.text).toContain('restored /work/a.ts')
+  expect(out.text).toContain('skipped /work/link.ts')
+  expect(files.get('/work/a.ts')).toBe('a')
+})
+
+test('Cancel at the question restores nothing', async ($, on) => {
+  const files = new Map([['/work/a.ts', 'a']])
+  stubs(on, files, [], { answer: 'Cancel' })
+  await start($)
+  await $.tool.call(write('/work/a.ts', 'A', 'agent-1'))
+  expect((await $.command.run({ command: 'undo-agent', args: 'last' })).text).toBe('Nothing restored.')
+  expect(files.get('/work/a.ts')).toBe('A')
 })

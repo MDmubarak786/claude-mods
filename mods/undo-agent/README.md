@@ -28,10 +28,10 @@ When a subagent that changed files finishes, a dim line in the transcript says s
 | Command | What it does |
 | :-- | :-- |
 | `/undo-agent` | List the agents that changed files this session, newest first, with the files. |
-| `/undo-agent last` | Put back the files the most recent agent changed. Files it created are removed. |
+| `/undo-agent last` | Put back the files the most recent agent changed, after a confirmation. Files it created are removed. |
 | `/undo-agent <id>` | The same for one agent by id. |
 
-Each restored or removed file is named in the reply. Your own turns' edits are never touched; use `/rewind` for those.
+A question asks first, because restoring overwrites whatever the files hold now, including edits made since. Each restored or removed file is named in the reply. Your own turns' edits are never touched; use `/rewind` for those.
 
 ## What it touches
 
@@ -39,7 +39,7 @@ From `claude plugin validate ./mods/undo-agent`:
 
 ```text
 hooks: session.start, tool.call{tool=Edit|Write|NotebookEdit}, turn.complete, command.run{command=undo-agent}
-calls: $.command.register, $.fs.read (via snapshot, restore), $.fs.stat (via snapshot), $.fs.write (via snapshot, restore), $.process.run (via restore), $.ui.log
+calls: $.command.register, $.fs.exists (via snapshot, restore), $.fs.read (via snapshot, restore), $.fs.stat (via snapshot, restore), $.fs.write (via snapshot, restore), $.process.run (via restore), $.ui.ask, $.ui.log
 ```
 
 - **`$.process.run`** runs `mktemp -d` once at session start for a scratch directory, and `rm -f -- <path>` only on a file the agent created, only when you run `/undo-agent`, and the path is printed. Nothing else is run.
@@ -54,7 +54,8 @@ calls: $.command.register, $.fs.read (via snapshot, restore), $.fs.stat (via sna
 
 - Snapshots live in memory and a temp directory for the session. A reload of the mod or a restart forgets them.
 - Only the three file-editing tools are watched. A subagent's Bash command that moves or deletes files isn't captured, the same gap `/rewind` has.
-- A file over 4 MiB isn't snapshotted and is named as skipped on undo.
+- A symlink, a directory, an unreadable file, or a file over 4 MiB isn't snapshotted and is named as skipped on undo. A path that has become a link by undo time is skipped too, so a restore never writes through a link.
+- Under `claude -p` nobody can confirm, so `/undo-agent last` restores nothing there.
 - The first snapshot of a file wins, so `/undo-agent` restores the state before the agent's first edit of it.
 
 ## License
