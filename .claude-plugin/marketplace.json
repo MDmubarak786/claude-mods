@@ -62,6 +62,18 @@
       ]
     },
     {
+      "name": "mcp-diet",
+      "source": "./mods/mcp-diet",
+      "description": "Choose which MCP tools and subagent types Claude sees, per project. A pane lists every server and tool with the size of its description; defer or hide the ones this repo never needs and stop paying for them on every request.",
+      "category": "context",
+      "tags": [
+        "context",
+        "mcp",
+        "tokens",
+        "subagents"
+      ]
+    },
+    {
       "name": "pins",
       "source": "./mods/pins",
       "description": "Pin instructions that survive compaction, /clear, and restarts. /pin saves a rule for this project and every prompt carries the pinned list as context Claude reads.",

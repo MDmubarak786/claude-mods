@@ -1,0 +1,10 @@
+{
+  "name": "mcp-diet",
+  "version": "0.1.0",
+  "description": "Choose which MCP tools and subagent types Claude sees, per project. A pane lists every server and tool with the size of its description; defer or hide the ones this repo never needs and stop paying for them on every request.",
+  "author": { "name": "Mohammed Mubarak" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/mcp-diet",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["mod"]
+}

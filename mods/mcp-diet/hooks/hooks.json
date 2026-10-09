@@ -1,0 +1,4 @@
+{
+  "description": "The mcp-diet hooks module",
+  "modules": ["./register.ts"]
+}

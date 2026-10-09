@@ -1,6 +1,6 @@
 # Roadmap: mods we want to merge
 
-Already in the catalog: [`fence`](../mods/fence/), [`circuit-breaker`](../mods/circuit-breaker/), [`ding`](../mods/ding/), [`show-paths`](../mods/show-paths/), [`copy-last`](../mods/copy-last/), [`right-tool`](../mods/right-tool/), [`undo-agent`](../mods/undo-agent/), [`pkg-guard`](../mods/pkg-guard/), [`style-cop`](../mods/style-cop/), [`big-output`](../mods/big-output/), [`pins`](../mods/pins/).
+Already in the catalog: [`fence`](../mods/fence/), [`circuit-breaker`](../mods/circuit-breaker/), [`ding`](../mods/ding/), [`show-paths`](../mods/show-paths/), [`copy-last`](../mods/copy-last/), [`right-tool`](../mods/right-tool/), [`undo-agent`](../mods/undo-agent/), [`pkg-guard`](../mods/pkg-guard/), [`style-cop`](../mods/style-cop/), [`big-output`](../mods/big-output/), [`pins`](../mods/pins/), [`mcp-diet`](../mods/mcp-diet/), [`memory-lint`](../mods/memory-lint/).
 
 Every entry below starts from a problem developers have on record, names the closest mod that already exists so you can check it isn't enough, and says which events and `$` calls make it work. The list is ordered smallest first, because a one-hook fix for a 186-reaction annoyance is worth more than a framework. The [ecosystem survey](ecosystem.md) explains what we deliberately don't build.
 
@@ -8,31 +8,7 @@ Every entry below starts from a problem developers have on record, names the clo
 
 Claim one by opening a **Mod idea** issue that links here.
 
-## 1. `mcp-diet` — choose which MCP tools Claude sees, per project
-
-**Pain.** Four MCP servers cost one developer 67,000 tokens before the first prompt. Tool search helps, but you can't say "in this repo, hide the Jira tools."
-
-**What it does.** `/mcp-diet` opens a pane listing every connected server and tool with the size of its description. Toggle a tool or a whole server to **deferred** (Claude sees the name only, until it searches) or **hidden**. Choices are saved per project.
-
-**How.** `tool.describe` returns `{ description, isDeferred }` from the saved choice; a hidden tool gets a one-line description and `isDeferred: true`. `agent.offer` can hide subagent types the same way. `$.tool.list` for the pane. Note for the README: `tool.describe` fires once per tool when its description is first sent, so a change takes effect on the next session, not live.
-
-**Nearest neighbour.** `harness-scope` picks a per-repo profile of skills, agents, and tools from `~/.claude`. No per-tool toggle with sizes.
-
-**Size.** Medium.
-
-## 2. `memory-lint` — know whether your memory index loaded whole
-
-**Pain.** The auto-memory index is read at session start up to a limit, and a session can't tell whether it got the whole file, a truncated one, or nothing. A 65-comment thread asks for the threshold to be visible and configurable.
-
-**What it does.** At session start, reads the project's memory index, reports its size against a limit you set, lists the entries past the cut, and offers a button to open the file. Warns in the turn footer when the index grows past the limit during a session.
-
-**How.** `session.start` and `classic.SessionStart`, `$.fs.read` and `$.fs.stat` on the index path, a `userConfig` option for the limit (the real limit isn't documented, which is the point of the thread, so don't hard-code one), `$.ui.status` for the warning, `$.ui.log` for the list.
-
-**Nearest neighbour.** None.
-
-**Size.** Tiny.
-
-## 3. `red-green` — tests run themselves after every turn
+## 1. `red-green` — tests run themselves after every turn
 
 **Pain.** Claude says "done", you run the tests, three fail, and you're back to prompting.
 
@@ -44,7 +20,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium.
 
-## 4. `standup` — your day, written for you
+## 2. `standup` — your day, written for you
 
 **Pain.** Writing the standup update, the changelog entry, or the end-of-day summary of what you and Claude actually did, across several repos.
 
@@ -56,7 +32,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Small to medium.
 
-## 5. `tripwire` — stop secrets leaving the machine
+## 3. `tripwire` — stop secrets leaving the machine
 
 **Pain.** Claude pastes a key into a file that's about to be committed, or runs `curl -d @.env`.
 
@@ -68,7 +44,7 @@ Claim one by opening a **Mod idea** issue that links here.
 
 **Size.** Medium.
 
-## 6. `trust-but-verify` — check what Claude claims against what it ran
+## 4. `trust-but-verify` — check what Claude claims against what it ran
 
 **Pain.** "Tests pass." No test command ran. "Verified in the browser." No browser tool was called. "This was approved earlier." It wasn't. [#69044](https://github.com/anthropics/claude-code/issues/69044) documents months of it.
 
