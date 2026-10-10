@@ -59,7 +59,7 @@ From `claude plugin validate ./mods/bingo`:
 
 ```text
 hooks: session.start, classic.SessionStart{source=clear|resume|fork}, command.run{command=bingo}, ui.close{id=bingo}, ui.render{component=Pane}
-calls: $.clock.every (via startAuto), $.clock.now (via load, startNew), $.command.register, $.state.get, $.state.set, $.store.get (via load), $.store.set (via save), $.ui.log, $.ui.open, $.ui.resolve, $.ui.toast
+calls: $.clock.every (via startAuto), $.clock.now (via load, startNew), $.command.register, $.session.surfaces, $.state.get, $.state.set, $.store.get (via load), $.store.set (via save), $.ui.log, $.ui.open, $.ui.resolve, $.ui.toast
 ```
 
 - **`$.store`** keeps the current game and the record, so a game survives a restart.

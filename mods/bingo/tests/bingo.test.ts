@@ -4,7 +4,7 @@ import { FREE, callNumber, claim, claudeLines, makeCard, newGame, toggleMark, yo
 const T0 = 1_700_000_000_000
 const STATS = { games: 0, wins: 0, losses: 0 }
 
-function stubs(on, options: { saved?: Map<string, unknown>; toasts?: string[]; placed?: boolean; now?: number } = {}) {
+function stubs(on, options: { saved?: Map<string, unknown>; toasts?: string[]; placed?: boolean; now?: number; surfaces?: string[] } = {}) {
   const saved = options.saved ?? new Map<string, unknown>()
   const clock = mock.clock(on, { now: options.now ?? T0 })
   on('store.get', ($, e) => ({ value: saved.get(e.key) }))
@@ -20,6 +20,7 @@ function stubs(on, options: { saved?: Map<string, unknown>; toasts?: string[]; p
     options.toasts?.push(e.text)
     return { value: undefined }
   })
+  on('session.surfaces', () => ({ value: options.surfaces ?? ['terminal'] }))
   on('ui.open', () => ({ value: { isPlaced: options.placed ?? true } }))
   on('ui.close', () => ({}))
   return { saved, clock }
@@ -184,8 +185,8 @@ test('Auto stops when Claude wins, and the toasts say so', async ($, on) => {
   await ui.unmount()
 })
 
-test('/bingo new starts over and keeps the record; /bingo prints a summary where no pane fits', async ($, on) => {
-  const { saved, clock } = stubs(on, { placed: false })
+test('/bingo new starts over and keeps the record; /bingo prints a summary where nothing draws', async ($, on) => {
+  const { saved, clock } = stubs(on, { surfaces: [] })
   await start($)
   const ui = await $.ui.mount(PANE)
   await ui.press({ key: 'call' })
@@ -206,4 +207,10 @@ test('a narrow pane stacks the cards', async ($, on) => {
   expect(await ui.find({ type: 'Text', text: 'Your card' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: "Claude's card" })).toBeDefined()
   await ui.unmount()
+})
+
+test('/bingo prints a summary when a surface exists but the pane cannot be placed', async ($, on) => {
+  stubs(on, { placed: false })
+  await start($)
+  expect((await $.command.run({ command: 'bingo', args: '' })).text).toContain('/bingo opens the pane')
 })

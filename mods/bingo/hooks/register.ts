@@ -133,6 +133,15 @@ export function register(on) {
       return { text: 'Games ' + s.games + ' · you ' + s.wins + ' · Claude ' + s.losses }
     }
     if (args) return { text: 'Usage: /bingo, /bingo new, /bingo speed N, or /bingo stats' }
+    // Under claude -p nothing draws, and ui.open still reports the pane as placed:
+    // the surfaces list is the reliable sign.
+    let surfaces = []
+    try {
+      surfaces = await $.session.surfaces()
+    } catch {
+      surfaces = []
+    }
+    if (!surfaces.length) return { text: summary(await read($, game)) }
     const placed = await $.ui.open({ id: PANE, title: 'Bingo', focus: true, closeOnEscape: true, rows: 26 })
     if (!placed.isPlaced) return { text: summary(await read($, game)) }
     const g = await read($, game)
