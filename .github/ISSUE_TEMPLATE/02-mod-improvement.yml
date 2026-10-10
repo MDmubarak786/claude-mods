@@ -10,6 +10,7 @@ body:
       options:
         # mods:start
         - big-output
+        - bingo
         - circuit-breaker
         - copy-last
         - ding

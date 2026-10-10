@@ -18,6 +18,18 @@
       ]
     },
     {
+      "name": "bingo",
+      "source": "./mods/bingo",
+      "description": "Classic 75-ball bingo, you against Claude. Numbers are called, you mark your card and shout Bingo first; Claude plays a card of its own and claims one call late, so you get a fair window. Zero tokens.",
+      "category": "fun",
+      "tags": [
+        "game",
+        "fun",
+        "pane",
+        "zero-tokens"
+      ]
+    },
+    {
       "name": "circuit-breaker",
       "source": "./mods/circuit-breaker",
       "description": "Stop Claude from retrying the same failing shell command over and over. After N identical failures the next attempt is held, and you choose: stop, or try once more.",
