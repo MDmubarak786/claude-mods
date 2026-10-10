@@ -73,8 +73,8 @@ calls: $.clock.every (via startAuto), $.clock.now (via load, startNew), $.comman
 
 ## Limitations
 
-- One game at a time per machine; two sessions share the same game through the store.
-- Auto runs only while the pane is open. Closing the pane pauses the game.
+- One game at a time per machine. A session loads the saved game when it starts and saves on every change, so two sessions playing at once overwrite each other: the last write wins.
+- Auto runs only while the pane is open, and turns itself off when a game ends. Closing the pane pauses the game.
 - Claude's card is drawn from the same pool as yours, so the two cards can share numbers; that's how real bingo works too.
 - The caller is pseudo-random from the game's seed, which makes a game reproducible from its seed rather than truly random.
 

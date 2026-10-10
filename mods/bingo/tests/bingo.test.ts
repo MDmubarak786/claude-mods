@@ -102,11 +102,11 @@ test('Claude claims at the call after it completes a line, unless you claimed fi
   expect(stolen.winningLine).toBe(g.claudeLine)
   expect(stolen.stats.losses).toBe(1)
   expect(stolen.called.length).toBe(g.called.length)
-  // Your claim in the window wins instead.
-  const line = yourLines({ ...g, yourMarks: [0, 1, 2, 3, 4, FREE] })
-  const mine = claim({ ...g, called: [...g.called, ...[0, 1, 2, 3, 4].map((p) => g.you[p])], yourMarks: [FREE, 0, 1, 2, 3, 4] })
+  // Your claim in the window wins instead, and Claude's pending line never fires.
+  const window = { ...g, called: [...g.called, ...[0, 1, 2, 3, 4].map((p) => g.you[p])], yourMarks: [FREE, 0, 1, 2, 3, 4] }
+  const mine = claim(window)
   expect(mine.game.winner).toBe('you')
-  expect(line).toEqual(['row 1'])
+  expect(callNumber(mine.game).winner).toBe('you')
 })
 
 // --- The mod
@@ -139,13 +139,17 @@ test('the pane draws both cards and the controls; Call, marking, and Bingo! work
   expect(await ui.find({ type: 'Text', text: /^called 1\/75$/ })).toBeDefined()
   await ui.press({ key: 'claim' })
   expect(toasts.some((t) => t.startsWith('Not a bingo'))).toBe(true)
-  // Mark a called number by finding its cell.
-  const pos = g.you.indexOf(g.called[0])
-  if (pos >= 0) {
-    await ui.press({ key: 'cell-' + pos })
+  // Call until a called number is on your card, then mark it by its cell.
+  let pos = -1
+  for (let i = 0; i < 75 && pos < 0; i++) {
     g = saved.get('game') as any
-    expect(g.yourMarks).toContain(pos)
+    pos = g.you.findIndex((n, p) => p !== FREE && g.called.includes(n))
+    if (pos < 0) await ui.press({ key: 'call' })
   }
+  expect(pos >= 0).toBe(true)
+  await ui.press({ key: 'cell-' + pos })
+  g = saved.get('game') as any
+  expect(g.yourMarks).toContain(pos)
   await ui.unmount()
 })
 
@@ -213,4 +217,83 @@ test('/bingo prints a summary when a surface exists but the pane cannot be place
   stubs(on, { placed: false })
   await start($)
   expect((await $.command.run({ command: 'bingo', args: '' })).text).toContain('/bingo opens the pane')
+})
+
+test('a column and a diagonal through FREE are lines too', async () => {
+  let g = newGame(11, STATS, 8, false)
+  const col = [2, 7, 17, 22]
+  g = { ...g, called: col.map((p) => g.you[p]), yourMarks: [FREE, ...col] }
+  expect(yourLines(g)).toEqual(['column N'])
+  const diag = [0, 6, 18, 24]
+  g = { ...g, called: diag.map((p) => g.you[p]), yourMarks: [FREE, ...diag] }
+  expect(yourLines(g)).toEqual(['diagonal ↘'])
+})
+
+test('a human win during Auto stops the caller and turns Auto off', async ($, on) => {
+  const toasts: string[] = []
+  const { saved, clock } = stubs(on, { toasts })
+  await start($)
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'auto' })
+  await clock.advance(8000)
+  // Hand the human a line, then shout.
+  let g = saved.get('game') as any
+  saved.set('game', { ...g, called: [...g.called, ...[0, 1, 2, 3, 4].map((p) => g.you[p])] })
+  // The drawing's state is what the press reads, so reload it from the store.
+  await $.classic.SessionStart({ source: 'clear' })
+  for (const p of [0, 1, 2, 3, 4]) await ui.press({ key: 'cell-' + p })
+  await ui.press({ key: 'claim' })
+  g = saved.get('game') as any
+  expect(g.winner).toBe('you')
+  expect(g.auto).toBe(false)
+  expect(toasts.some((t) => t.startsWith('BINGO! You won'))).toBe(true)
+  const calls = g.called.length
+  await clock.advance(8000 * 3)
+  expect((saved.get('game') as any).called.length).toBe(calls)
+  await ui.press({ key: 'call' })
+  expect(toasts.some((t) => t.startsWith('The game is over'))).toBe(true)
+  await ui.unmount()
+})
+
+test('/bingo speed is clamped to 1..120 and rejects other input', async ($, on) => {
+  const { saved } = stubs(on)
+  await start($)
+  expect((await $.command.run({ command: 'bingo', args: 'speed 0' })).text).toBe('Auto calls a number every 1 second.')
+  expect((await $.command.run({ command: 'bingo', args: 'speed 999' })).text).toBe('Auto calls a number every 120 seconds.')
+  expect((saved.get('game') as any).speed).toBe(120)
+  for (const bad of ['speed', 'speed -1', 'speed 5.5']) expect((await $.command.run({ command: 'bingo', args: bad })).text).toMatch(/^Usage/)
+})
+
+test('a store that cannot be read never wipes the record', async ($, on) => {
+  const clock = mock.clock(on, { now: T0 })
+  on('store.get', () => ({ deny: 'store unavailable' }))
+  const writes: unknown[] = []
+  on('store.set', ($, e) => {
+    writes.push(e.value)
+    return { value: undefined }
+  })
+  on('command.register', () => ({ value: undefined }))
+  on('session.start', () => ({ cwd: '/work' }))
+  on('ui.log', () => ({ value: undefined }))
+  on('session.surfaces', () => ({ value: [] }))
+  await start($)
+  expect(writes).toEqual([])
+  expect((await $.command.run({ command: 'bingo', args: '' })).text).toContain('0/75 called')
+})
+
+test('a finished or corrupt saved game is handled', async ($, on) => {
+  const finished = { ...newGame(3, { games: 4, wins: 2, losses: 2 }, 8, true), winner: 'you', winningLine: 'row 1', auto: true }
+  const { saved } = stubs(on, { saved: new Map<string, unknown>([['game', finished]]) })
+  await start($)
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: /You won with row 1\. Press n/ })).toBeDefined()
+  await ui.press({ key: 'new' })
+  const g = saved.get('game') as any
+  expect(g.winner).toBe(null)
+  expect(g.auto).toBe(false)
+  expect(g.stats).toEqual({ games: 5, wins: 2, losses: 2 })
+  await ui.unmount()
+  saved.set('game', { seed: 1, you: [1, 2] })
+  await $.classic.SessionStart({ source: 'clear' })
+  expect((saved.get('game') as any).you.length).toBe(25)
 })

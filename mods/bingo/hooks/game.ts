@@ -115,5 +115,9 @@ export function isGame(x: unknown): x is Game {
   if (!x || typeof x !== 'object') return false
   const g = x as Record<string, unknown>
   const card = (c: unknown) => Array.isArray(c) && c.length === 25 && c.every((n) => Number.isInteger(n))
-  return typeof g.seed === 'number' && card(g.you) && card(g.claude) && Array.isArray(g.called) && Array.isArray(g.yourMarks) && typeof g.speed === 'number' && !!g.stats && typeof g.stats === 'object'
+  const numbers = (c: unknown) => Array.isArray(c) && c.every((n) => Number.isInteger(n))
+  const stats = g.stats as Record<string, unknown> | undefined
+  return typeof g.seed === 'number' && card(g.you) && card(g.claude) && numbers(g.called) && numbers(g.yourMarks) && typeof g.speed === 'number' &&
+    (g.winner === null || g.winner === 'you' || g.winner === 'claude') && !!stats && typeof stats === 'object' &&
+    ['games', 'wins', 'losses'].every((k) => Number.isInteger(stats[k]))
 }

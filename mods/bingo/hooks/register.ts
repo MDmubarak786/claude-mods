@@ -32,32 +32,47 @@ async function save($, g: Game) {
   }
 }
 
-async function set($, g: Game) {
-  await update($, game, () => g)
-  await save($, g)
+// Apply a change through update's read-modify-write, so a timer tick and a
+// press landing together never overwrite each other, then mirror it to the store.
+async function change($, fn: (cur: Game) => Game): Promise<Game> {
+  let out: Game | null = null
+  await update($, game, (cur) => {
+    out = fn(cur)
+    return out
+  })
+  if (out) await save($, out)
+  return out ?? (await read($, game))
 }
 
 async function load($) {
-  let g: Game | null = null
+  let saved: unknown = undefined
+  let readable = true
   try {
-    const saved = await $.store.get('game')
-    if (isGame(saved)) g = saved
+    saved = await $.store.get('game')
   } catch {
-    g = null
+    readable = false
   }
-  if (!g) {
-    g = newGame(await $.clock.now(), EMPTY_STATS, DEFAULT_SPEED, false)
-    g = { ...g, stats: { ...g.stats, games: 1 } }
-    await save($, g)
+  if (isGame(saved)) {
+    await update($, game, () => saved as Game)
+    return
   }
-  await update($, game, () => g!)
+  if (!readable) {
+    // The store can't be read: keep whatever is in memory, or start a game in
+    // memory only, and never write over the saved record.
+    const cur = await read($, game)
+    if (!cur.you.length) await update($, game, () => newGame(Date.now(), EMPTY_STATS, DEFAULT_SPEED, false))
+    $.ui.log('bingo could not read its saved game; playing without saving')
+    return
+  }
+  const fresh = newGame(await $.clock.now(), { ...EMPTY_STATS, games: 1 }, DEFAULT_SPEED, false)
+  await update($, game, () => fresh)
+  await save($, fresh)
 }
 
 async function startNew($) {
-  const g = await read($, game)
-  const fresh = newGame(await $.clock.now(), { ...g.stats, games: g.stats.games + 1 }, g.speed, g.auto)
-  await set($, fresh)
-  return fresh
+  stopAuto()
+  const now = await $.clock.now()
+  return change($, (g) => newGame(now, { ...g.stats, games: g.stats.games + 1 }, g.speed, false))
 }
 
 function stopAuto() {
@@ -66,23 +81,49 @@ function stopAuto() {
 }
 
 async function call($) {
-  const g = await read($, game)
-  if (g.winner || !g.you.length) return
-  const next = callNumber(g)
-  await set($, next)
+  let before: Game | null = null
+  const next = await change($, (g) => {
+    before = g
+    if (g.winner || !g.you.length) return g
+    const n = callNumber(g)
+    return n.winner ? { ...n, auto: false } : n
+  })
+  const was = before as Game | null
+  if (!was || !was.you.length) return
+  if (was.winner) {
+    stopAuto()
+    $.ui.toast('The game is over. Press n for a new game.')
+    return
+  }
+  if (next === was) {
+    // Nothing left to call: don't tick forever.
+    stopAuto()
+    return
+  }
   if (next.winner === 'claude') {
     stopAuto()
     $.ui.toast('Claude: BINGO! ' + next.winningLine + '. New game: n', { timeoutMs: 6000 })
-  } else if (next.claudeLine && !g.claudeLine) {
+  } else if (next.claudeLine && !was.claudeLine) {
     $.ui.toast('Claude has ' + next.claudeLine + '. Shout before the next call!', { timeoutMs: 5000 })
   }
 }
 
 async function startAuto($) {
-  stopAuto()
   const g = await read($, game)
   if (g.winner) return
-  timer = $.clock.every(Math.max(1, g.speed) * 1000, () => call($))
+  stopAuto()
+  timer = $.clock.every(Math.max(1, g.speed) * 1000, async () => {
+    try {
+      const cur = await read($, game)
+      if (!cur.auto || cur.winner) {
+        stopAuto()
+        return
+      }
+      await call($)
+    } catch {
+      // A failed tick is skipped; the next one tries again.
+    }
+  })
 }
 
 function summary(g: Game): string {
@@ -116,15 +157,13 @@ export function register(on) {
   on('command.run', { command: 'bingo' }, async ($, e) => {
     const args = e.args.trim()
     if (args === 'new') {
-      stopAuto()
       const g = await startNew($)
       return { text: 'New game. ' + summary(g) }
     }
     const speed = /^speed\s+(\d+)$/.exec(args)
     if (speed) {
       const s = Math.max(1, Math.min(120, Number(speed[1])))
-      const g = await read($, game)
-      await set($, { ...g, speed: s })
+      await change($, (g) => ({ ...g, speed: s }))
       if (timer) await startAuto($)
       return { text: 'Auto calls a number every ' + s + ' second' + (s === 1 ? '' : 's') + '.' }
     }
@@ -165,7 +204,7 @@ export function register(on) {
     const last = g.called.length ? callLabel(g.called[g.called.length - 1]) : '—'
     const recent = g.called.slice(-8).map(callLabel).join('  ')
 
-    const status = g.winner === 'you' ? { text: 'BINGO! You won with ' + g.winningLine + '.', color: 'green' }
+    const status = g.winner === 'you' ? { text: 'BINGO! You won with ' + g.winningLine + '. Press n for a new game.', color: 'green' }
       : g.winner === 'claude' ? { text: 'Claude won with ' + g.winningLine + '. Press n for a new game.', color: 'red' }
       : g.claudeLine ? { text: 'Claude has ' + g.claudeLine + ' and claims at the next call. Shout first: b', color: 'yellow' }
       : { text: 'Mark called numbers on your card, then press b when you have a line.', dim: true }
@@ -189,11 +228,15 @@ export function register(on) {
           const n = g.you[pos]
           const marked = g.yourMarks.includes(pos)
           const calledNum = pos === FREE || g.called.includes(n)
-          const label = pos === FREE ? '★' : String(n).padStart(2)
-          return Button({ key: 'cell-' + pos, label: (marked ? '✔' : ' ') + label, plain: true, dimColor: !calledNum, variant: marked ? 'primary' : 'secondary', onPress: async () => {
-            const r = toggleMark(await read($, game), pos)
-            if (r.error) $.ui.toast(r.error)
-            else await set($, r.game)
+          const label = pos === FREE ? ' ★' : String(n).padStart(2)
+          return Button({ key: 'cell-' + pos, label: (marked ? '✔' : ' ') + label, plain: true, dimColor: !calledNum, onPress: async () => {
+            let error: string | undefined
+            await change($, (cur) => {
+              const r = toggleMark(cur, pos)
+              error = r.error
+              return r.game
+            })
+            if (error) $.ui.toast(error)
           } })
         }),
       }),
@@ -221,25 +264,24 @@ export function register(on) {
       children: [
         Button({ key: 'call', label: 'Call', hotkey: 'c', plain: true, onPress: () => call($) }),
         Button({ key: 'auto', label: g.auto ? 'Auto on' : 'Auto off', hotkey: 'a', plain: true, onPress: async () => {
-          const cur = await read($, game)
-          await set($, { ...cur, auto: !cur.auto })
-          if (!cur.auto) await startAuto($)
+          const updated = await change($, (cur) => (cur.winner ? cur : { ...cur, auto: !cur.auto }))
+          if (updated.auto) await startAuto($)
           else stopAuto()
         } }),
-        Button({ key: 'claim', label: 'Bingo!', hotkey: 'b', plain: true, variant: 'primary', onPress: async () => {
-          const r = claim(await read($, game))
-          if (r.error) $.ui.toast(r.error)
+        Button({ key: 'claim', label: 'Bingo!', hotkey: 'b', plain: true, onPress: async () => {
+          let error: string | undefined
+          const updated = await change($, (cur) => {
+            const r = claim(cur)
+            error = r.error
+            return r.error ? cur : { ...r.game, auto: false }
+          })
+          if (error) $.ui.toast(error)
           else {
             stopAuto()
-            await set($, r.game)
-            $.ui.toast('BINGO! You won with ' + r.game.winningLine + '.', { timeoutMs: 6000 })
+            $.ui.toast('BINGO! You won with ' + updated.winningLine + '.', { timeoutMs: 6000 })
           }
         } }),
-        Button({ key: 'new', label: 'New game', hotkey: 'n', plain: true, onPress: async () => {
-          stopAuto()
-          const fresh = await startNew($)
-          if (fresh.auto) await startAuto($)
-        } }),
+        Button({ key: 'new', label: 'New game', hotkey: 'n', plain: true, onPress: () => startNew($) }),
         Text({ dimColor: true, children: ['Esc closes · ' + g.stats.wins + '-' + g.stats.losses] }),
       ],
     })
