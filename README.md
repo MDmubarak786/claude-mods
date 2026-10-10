@@ -42,7 +42,6 @@ claude --plugin-dir ./mods/fence
 | Mod | What it does | Version |
 | :-- | :-- | :-- |
 | [`big-output`](mods/big-output/) | Keep huge shell output out of the context window. A Bash result over a threshold is saved to a file and Claude gets its head and tail plus a slice tool to grep or page the rest on demand. | 0.1.0 |
-| [`bingo`](mods/bingo/) | Tool-call bingo: a daily 5×5 card of things Claude does, filled in by itself as it works. Zero tokens, zero effort, one BINGO toast when a line completes. | 0.1.0 |
 | [`circuit-breaker`](mods/circuit-breaker/) | Stop Claude from retrying the same failing shell command over and over. After N identical failures the next attempt is held, and you choose: stop, or try once more. | 0.1.0 |
 | [`copy-last`](mods/copy-last/) | Copy Claude's last reply, or its last code block, to the clipboard as clean Markdown with /copy, with no terminal indentation or trailing spaces. | 0.1.0 |
 | [`ding`](mods/ding/) | Play a sound and post a desktop notification when Claude finishes a turn or needs you to answer a question or a permission prompt. | 0.1.0 |
@@ -56,6 +55,7 @@ claude --plugin-dir ./mods/fence
 | [`show-paths`](mods/show-paths/) | Put the file path on every Read, Edit, Write, Glob, and Grep row in the transcript, so you never expand a row just to learn which file it touched. | 0.1.0 |
 | [`standup`](mods/standup/) | Your day, written for you. Every turn is logged; /standup turns today's work across every session on the machine into a three-bullet update, or a Markdown file. | 0.1.0 |
 | [`style-cop`](mods/style-cop/) | Enforce the style rules Claude keeps ignoring: banned words and phrases, a comment-density cap on added code, and files that must not gain comments. Rules live in .claude/style-cop.md and are both shown to Claude and enforced on edits. | 0.1.0 |
+| [`tool-bingo`](mods/tool-bingo/) | Tool-call bingo: a daily 5×5 card of things Claude does, filled in by itself as it works. Zero tokens, zero effort, one BINGO toast when a line completes. | 0.1.0 |
 | [`tripwire`](mods/tripwire/) | Stop secrets leaving the machine. Holds an edit or command that writes an API key, a private key, or a credential literal, a command that reads a secret file and talks to the network, and a git commit whose staged changes contain a secret. Refuses by default. | 0.1.0 |
 | [`trust-but-verify`](mods/trust-but-verify/) | Check what Claude claims against what it ran. When an answer says the tests pass, the build is clean, or something was committed, a line under it says whether a matching command actually ran this turn and succeeded. | 0.1.0 |
 | [`undo-agent`](mods/undo-agent/) | Undo the file edits a subagent made. /rewind restores your own turns, but not a subagent's edits; this snapshots them and puts the files back with one command. | 0.1.1 |

@@ -42,7 +42,7 @@ function stubs(on, options: { now?: number; saved?: Map<string, unknown>; toasts
 }
 
 const start = ($) => $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
-const PANE = { plugin: 'bingo', component: 'Pane', requestId: 'bingo', surface: 'terminal', viewport: { columns: 120, rows: 40 }, props: { title: 'Bingo', isFocused: true, bodyColumns: 70, placement: 'inline', scroll: { offset: 0, bodyRows: 24 }, view: {} } } as const
+const PANE = { plugin: 'tool-bingo', component: 'Pane', requestId: 'tool-bingo', surface: 'terminal', viewport: { columns: 120, rows: 40 }, props: { title: 'Bingo', isFocused: true, bodyColumns: 70, placement: 'inline', scroll: { offset: 0, bodyRows: 24 }, view: {} } } as const
 
 // --- Pure logic
 
@@ -180,7 +180,7 @@ test('a refused call is a square, but a subagent\'s calls are not counted', asyn
 test('/bingo itself is not a slash-command square, and only your own commands count', async ($, on) => {
   const { saved } = stubs(on)
   await start($)
-  await $.command.run({ command: 'bingo', args: 'card' })
+  await $.command.run({ command: 'tool-bingo', args: 'card' })
   await $.command.run({ command: 'help', args: '', origin: { kind: 'plugin', name: 'x' } })
   expect(Object.keys((saved.get('card:' + DAY) as any).marks)).toEqual([])
   await $.command.run({ command: 'help', args: '', origin: { kind: 'composer' } })
@@ -206,27 +206,27 @@ test('/bingo card prints the grid; /bingo new reshuffles; loud and stats work', 
   const toasts: string[] = []
   const { saved } = stubs(on, { toasts })
   await start($)
-  const text = (await $.command.run({ command: 'bingo', args: 'card' })).text
+  const text = (await $.command.run({ command: 'tool-bingo', args: 'card' })).text
   expect(text).toContain('Bingo for ' + DAY + ' · 0/24 marked · 0 lines')
   expect(text).toContain('[x] FREE')
   expect(text.split('\n').length).toBe(6)
-  const fresh = (await $.command.run({ command: 'bingo', args: 'new' })).text
+  const fresh = (await $.command.run({ command: 'tool-bingo', args: 'new' })).text
   expect(fresh).toContain('New card for today.')
   expect((saved.get('card:' + DAY) as any).salt).toBe(1)
   expect((saved.get('card:' + DAY) as any).ids).toEqual(drawCard(DAY, 1))
   expect((saved.get('stats') as any).cards).toBe(2)
-  expect((await $.command.run({ command: 'bingo', args: 'loud' })).text).toMatch(/^Loud/)
+  expect((await $.command.run({ command: 'tool-bingo', args: 'loud' })).text).toMatch(/^Loud/)
   expect(saved.get('loud')).toBe(true)
   await $.tool.call({ tool: 'Grep', pattern: 'x' })
   if (drawCard(DAY, 1).includes('grep')) expect(toasts).toContain('bingo: used Grep')
-  expect((await $.command.run({ command: 'bingo', args: 'stats' })).text).toBe('Cards played 2 · lines completed 0 · blackouts 0')
-  expect((await $.command.run({ command: 'bingo', args: 'what' })).text).toMatch(/^Usage/)
+  expect((await $.command.run({ command: 'tool-bingo', args: 'stats' })).text).toBe('Cards played 2 · lines completed 0 · blackouts 0')
+  expect((await $.command.run({ command: 'tool-bingo', args: 'what' })).text).toMatch(/^Usage/)
 })
 
 test('where no pane can be placed, /bingo prints the card', async ($, on) => {
   stubs(on, { placed: false })
   await start($)
-  expect((await $.command.run({ command: 'bingo', args: '' })).text).toContain('Bingo for ' + DAY)
+  expect((await $.command.run({ command: 'tool-bingo', args: '' })).text).toContain('Bingo for ' + DAY)
 })
 
 test('the pane draws 25 cells, marks them, and its buttons work', async ($, on) => {
@@ -264,7 +264,7 @@ test('old cards are pruned and the card survives /clear', async ($, on) => {
   expect(saved.has('card:2026-01-01')).toBe(false)
   await $.tool.call({ tool: 'Grep', pattern: 'x' })
   await $.classic.SessionStart({ source: 'clear' })
-  const text = (await $.command.run({ command: 'bingo', args: 'card' })).text
+  const text = (await $.command.run({ command: 'tool-bingo', args: 'card' })).text
   const ids = drawCard(DAY, 0)
   if (ids.includes('grep')) expect(text).toContain('[x] used Grep')
 })

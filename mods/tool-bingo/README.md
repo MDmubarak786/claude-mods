@@ -1,4 +1,4 @@
-# bingo
+# tool-bingo
 
 Tool-call bingo. Every day you get a 5×5 card of things Claude does: ran the tests, read a README, edited the same file three times, interrupted mid-turn, went online. The squares fill in by themselves as Claude works. When a row, column, or diagonal completes, a toast says BINGO.
 
@@ -19,24 +19,24 @@ Screenshot of the pane wanted: nobody has photographed it yet.
 
 ```text
 /plugin marketplace add MDmubarak786/claude-mods
-/plugin install bingo@modhub
+/plugin install tool-bingo@modhub
 ```
 
 Try it for one session without installing:
 
 ```bash
-claude --plugin-dir ./mods/bingo
+claude --plugin-dir ./mods/tool-bingo
 ```
 
 ## Use it
 
 | Command | What it does |
 | :-- | :-- |
-| `/bingo` | Open the card in a pane. Where no pane can be drawn, print it instead. |
-| `/bingo card` | Print the card as text. |
-| `/bingo new` | Reshuffle today's card. Marks start over. |
-| `/bingo loud`, `/bingo quiet` | Toast every square as it fills, or only completed lines (the default). |
-| `/bingo stats` | Cards played, lines completed, blackouts. |
+| `/tool-bingo` | Open the card in a pane. Where no pane can be drawn, print it instead. |
+| `/tool-bingo card` | Print the card as text. |
+| `/tool-bingo new` | Reshuffle today's card. Marks start over. |
+| `/tool-bingo loud`, `/tool-bingo quiet` | Toast every square as it fills, or only completed lines (the default). |
+| `/tool-bingo stats` | Cards played, lines completed, blackouts. |
 
 In the pane, **n** draws a new card, **l** toggles loud, and Esc closes it. The pane needs about 55 columns for bordered cells; narrower, it draws one compact text row per card row.
 
@@ -89,17 +89,17 @@ A card is 24 of these plus a FREE center, drawn from the date so every session a
 | `night owl` | A turn ended between 10 pm and 5 am, by your clock. |
 | `subagent` | Claude started a subagent. |
 | `compaction` | The conversation was compacted. |
-| `you: /cmd` | You ran a slash command (other than /bingo). |
+| `you: /cmd` | You ran a slash command (other than /tool-bingo). |
 <!-- squares:end -->
 
 Only the main conversation is watched. What a subagent does counts as one square, `subagent`, however many tools it uses.
 
 ## What it touches
 
-From `claude plugin validate ./mods/bingo`:
+From `claude plugin validate ./mods/tool-bingo`:
 
 ```text
-hooks: session.start, classic.SessionStart{source=clear|resume|fork}, command.run{command=bingo}, command.run, turn.start, tool.call, turn.complete, agent.spawn, session.compact, ui.render{component=Pane}
+hooks: session.start, classic.SessionStart{source=clear|resume|fork}, command.run{command=tool-bingo}, command.run, turn.start, tool.call, turn.complete, agent.spawn, session.compact, ui.render{component=Pane}
 calls: $.clock.now, $.command.register, $.state.get, $.state.set, $.store.delete (via prune), $.store.get (via load, mark, savedStats), $.store.keys (via prune), $.store.set, $.ui.log, $.ui.open, $.ui.resolve, $.ui.toast (via mark)
 ```
 

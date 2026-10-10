@@ -10,7 +10,6 @@ body:
       options:
         # mods:start
         - big-output
-        - bingo
         - circuit-breaker
         - copy-last
         - ding
@@ -24,6 +23,7 @@ body:
         - show-paths
         - standup
         - style-cop
+        - tool-bingo
         - tripwire
         - trust-but-verify
         - undo-agent

@@ -1,9 +1,9 @@
 {
-  "name": "bingo",
+  "name": "tool-bingo",
   "version": "0.1.0",
   "description": "Tool-call bingo: a daily 5×5 card of things Claude does, filled in by itself as it works. Zero tokens, zero effort, one BINGO toast when a line completes.",
   "author": { "name": "Mohammed Mubarak" },
-  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/bingo",
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/tool-bingo",
   "repository": "https://github.com/MDmubarak786/claude-mods",
   "license": "MIT",
   "keywords": ["mod", "game", "pane", "fun"],

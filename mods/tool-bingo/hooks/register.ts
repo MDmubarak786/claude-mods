@@ -1,11 +1,11 @@
-// bingo: tool-call bingo. A daily 5×5 card of things Claude does, filled in
+// tool-bingo: tool-call bingo. A daily 5×5 card of things Claude does, filled in
 // by itself as Claude works.
 //
-//   /bingo          open the card in a pane (prints it where no pane can draw)
-//   /bingo card     print the card as text
-//   /bingo new      reshuffle today's card
-//   /bingo loud     toast every square as it fills; /bingo quiet for lines only
-//   /bingo stats    cards played, lines completed, blackouts
+//   /tool-bingo          open the card in a pane (prints it where no pane can draw)
+//   /tool-bingo card     print the card as text
+//   /tool-bingo new      reshuffle today's card
+//   /tool-bingo loud     toast every square as it fills; /tool-bingo quiet for lines only
+//   /tool-bingo stats    cards played, lines completed, blackouts
 //
 // Every session on the machine draws the same card for the day, from the date,
 // and marks are shared through the store, so a line can be finished across
@@ -17,11 +17,11 @@ import type { Game, Stats } from '../types'
 import { CARD_SIZE, FREE, SQUARES, completedLines, dayOf, drawCard, emptyTurn, idAt, isMarked, labelOf, noteToolInTurn, squaresForTool, squaresForTurn } from './squares'
 import type { TurnStats } from './squares'
 
-const PANE = 'bingo'
+const PANE = 'tool-bingo'
 const KEEP_DAYS = 14
 const EMPTY_STATS: Stats = { cards: 0, lines: 0, blackouts: 0 }
 const EMPTY: Game = { date: '', ids: [], salt: 0, marks: {}, loud: false, stats: EMPTY_STATS }
-const game = atom({ plugin: 'bingo', key: 'game' } as const, EMPTY)
+const game = atom({ plugin: 'tool-bingo', key: 'game' } as const, EMPTY)
 
 // The main conversation's current turn. Subagents are ignored.
 let turn: TurnStats = emptyTurn()
@@ -143,9 +143,9 @@ export function register(on) {
     await load($)
     await prune($)
     try {
-      await $.command.register({ name: 'bingo', description: 'Tool-call bingo: a daily card of things Claude does', argumentHint: '[card | new | loud | quiet | stats]', immediate: true })
+      await $.command.register({ name: 'tool-bingo', description: 'Tool-call bingo: a daily card of things Claude does', argumentHint: '[card | new | loud | quiet | stats]', immediate: true })
     } catch (error) {
-      $.ui.log('could not register /bingo: ' + error)
+      $.ui.log('could not register /tool-bingo: ' + error)
     }
     return next(e)
   })
@@ -156,7 +156,7 @@ export function register(on) {
     return next(e)
   }).catch(async ($, e, next) => next(e))
 
-  on('command.run', { command: 'bingo' }, async ($, e) => {
+  on('command.run', { command: 'tool-bingo' }, async ($, e) => {
     const args = e.args.trim()
     if (args === 'card') return { text: cardText(await read($, game)) }
     if (args === 'new') {
@@ -173,15 +173,15 @@ export function register(on) {
       const s = (await read($, game)).stats
       return { text: 'Cards played ' + s.cards + ' · lines completed ' + s.lines + ' · blackouts ' + s.blackouts }
     }
-    if (args) return { text: 'Usage: /bingo, /bingo card, /bingo new, /bingo loud, /bingo quiet, or /bingo stats' }
+    if (args) return { text: 'Usage: /tool-bingo, /tool-bingo card, /tool-bingo new, /tool-bingo loud, /tool-bingo quiet, or /tool-bingo stats' }
     const placed = await $.ui.open({ id: PANE, title: 'Bingo', focus: true, closeOnEscape: true, rows: 24 })
     if (!placed.isPlaced) return { text: cardText(await read($, game)) }
     return {}
   }).catch(async () => ({ text: 'bingo: the command failed.' }))
 
-  // Your own slash commands count, apart from /bingo itself.
+  // Your own slash commands count, apart from /tool-bingo itself.
   on('command.run', async ($, e, next) => {
-    if (e.command !== 'bingo' && e.origin && e.origin.kind === 'composer') await mark($, ['slash'])
+    if (e.command !== 'tool-bingo' && e.origin && e.origin.kind === 'composer') await mark($, ['slash'])
     return next(e)
   }).catch(async ($, e, next) => next(e))
 

@@ -47,7 +47,7 @@ export const SQUARES: Square[] = [
   { id: 'night-owl', label: 'night owl', detail: 'A turn ended between 10 pm and 5 am, by your clock.' },
   { id: 'subagent', label: 'subagent', detail: 'Claude started a subagent.' },
   { id: 'compact', label: 'compaction', detail: 'The conversation was compacted.' },
-  { id: 'slash', label: 'you: /cmd', detail: 'You ran a slash command (other than /bingo).' },
+  { id: 'slash', label: 'you: /cmd', detail: 'You ran a slash command (other than /tool-bingo).' },
 ]
 
 export const FREE = 12

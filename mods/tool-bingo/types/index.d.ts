@@ -17,6 +17,6 @@ export type Game = {
 
 declare module 'claude-code' {
   interface PluginState {
-    bingo: { game: Game }
+    'tool-bingo': { game: Game }
   }
 }

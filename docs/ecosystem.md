@@ -18,7 +18,7 @@ The launch thread, [anthropics/claude-code#91870](https://github.com/anthropics/
 ## Crowded fields: don't build another one
 
 - **Usage, cost, and context meters.** `cctop`, `token-ledger`, `context-lens`, `quota-meter`, `burn-meter`, `cache-inspector`, `context-view`, `usage-band`, `weektoken`, `clawd-dash`, `context-bar`, `hud`, `statuspane`, Anthropic's `token-weather`, and more. Every angle is taken: band, pane, sparkline, forecast, Desktop rings.
-- **Things to look at while you wait.** Games (`cc-arcade`, `minefield`, Doom twice), pets (`nibbl`, `claude-pokemon`, `clawd-tales`), breathing (`Mindful-Claude`), quotes, stock tickers, music. The one game this repository does ship, [`bingo`](../mods/bingo/), is different in kind: it plays itself from what Claude does, with no input and no tokens, which none of those do.
+- **Things to look at while you wait.** Games (`cc-arcade`, `minefield`, Doom twice), pets (`nibbl`, `claude-pokemon`, `clawd-tales`), breathing (`Mindful-Claude`), quotes, stock tickers, music. The one game this repository does ship, [`tool-bingo`](../mods/tool-bingo/), is different in kind: it plays itself from what Claude does, with no input and no tokens, which none of those do.
 - **Pull request and CI watchers.** `cc-pr-tracker`, `pr-pulse`, `gh-ci-status`, `review-inbox`, `review-watch`, `github-issues`, `vercel-deploy-status`.
 - **Risky-command holds.** Anthropic's `blast-radius`, `launch-codes`, `merge-gate`, a second `blast-radius`.
 - **Secret redaction before the model reads.** `secret-redactor`, `honmoon-redact`, `screen-guard`.

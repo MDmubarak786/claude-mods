@@ -41,7 +41,7 @@ echo "== README hooks and calls blocks"
 node scripts/sync-touches.mjs --check || failed=1
 
 echo
-echo "== bingo square table"
+echo "== tool-bingo square table"
 node scripts/sync-squares.mjs --check || failed=1
 
 echo
