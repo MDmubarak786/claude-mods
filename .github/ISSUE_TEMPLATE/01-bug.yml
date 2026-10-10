@@ -27,6 +27,7 @@ body:
         - show-paths
         - standup
         - style-cop
+        - tool-bingo
         - tripwire
         - trust-but-verify
         - undo-agent

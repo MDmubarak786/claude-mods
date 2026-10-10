@@ -167,6 +167,18 @@
       ]
     },
     {
+      "name": "tool-bingo",
+      "source": "./mods/tool-bingo",
+      "description": "Tool-call bingo: a daily 5×5 card of things Claude does, filled in by itself as it works. Zero tokens, zero effort, one BINGO toast when a line completes.",
+      "category": "fun",
+      "tags": [
+        "game",
+        "fun",
+        "pane",
+        "zero-tokens"
+      ]
+    },
+    {
       "name": "tripwire",
       "source": "./mods/tripwire",
       "description": "Stop secrets leaving the machine. Holds an edit or command that writes an API key, a private key, or a credential literal, a command that reads a secret file and talks to the network, and a git commit whose staged changes contain a secret. Refuses by default.",
