@@ -16,6 +16,7 @@ body:
         - big-output
         - bingo
         - circuit-breaker
+        - connect-four
         - copy-last
         - ding
         - fence

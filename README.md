@@ -44,6 +44,7 @@ claude --plugin-dir ./mods/fence
 | [`big-output`](mods/big-output/) | Keep huge shell output out of the context window. A Bash result over a threshold is saved to a file and Claude gets its head and tail plus a slice tool to grep or page the rest on demand. | 0.1.0 |
 | [`bingo`](mods/bingo/) | Classic 75-ball bingo, you against Claude. Numbers are called, you mark your card and shout Bingo first; Claude plays a card of its own and claims one call late, so you get a fair window. Zero tokens. | 0.1.1 |
 | [`circuit-breaker`](mods/circuit-breaker/) | Stop Claude from retrying the same failing shell command over and over. After N identical failures the next attempt is held, and you choose: stop, or try once more. | 0.1.0 |
+| [`connect-four`](mods/connect-four/) | Connect Four against Claude, in a pane. Press a column's digit to drop a disc; Claude answers in half a second at three levels, from beatable to a seven-move lookahead. Zero tokens. | 0.1.0 |
 | [`copy-last`](mods/copy-last/) | Copy Claude's last reply, or its last code block, to the clipboard as clean Markdown with /copy, with no terminal indentation or trailing spaces. | 0.1.0 |
 | [`ding`](mods/ding/) | Play a sound and post a desktop notification when Claude finishes a turn or needs you to answer a question or a permission prompt. | 0.1.0 |
 | [`fence`](mods/fence/) | Limit which paths Claude may edit in a project with one /fence command. Edits outside the fence are refused with a reason Claude can act on. | 0.1.2 |
