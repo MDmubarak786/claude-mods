@@ -1,0 +1,11 @@
+{
+  "name": "snake",
+  "version": "0.1.0",
+  "description": "Snake in a pane. Steer with w, a, s and d, eat the food, don't hit the walls or yourself. Pause with p, pick the speed, high score kept. Zero tokens.",
+  "author": { "name": "Mohammed Mubarak" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/snake",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["mod", "game", "pane", "fun"],
+  "types": "./types/index.d.ts"
+}
