@@ -1,5 +1,5 @@
 import { expect, mock, test } from 'claude-code/testing'
-import { FREE, callNumber, claim, claudeLines, makeCard, newGame, toggleMark, yourLines } from '../hooks/game'
+import { FREE, callLabel, callNumber, claim, claudeLines, makeCard, newGame, toggleMark, yourLines } from '../hooks/game'
 
 const T0 = 1_700_000_000_000
 const STATS = { games: 0, wins: 0, losses: 0 }
@@ -203,13 +203,17 @@ test('/bingo new starts over and keeps the record; /bingo prints a summary where
   expect((await $.command.run({ command: 'bingo', args: 'what' })).text).toMatch(/^Usage/)
 })
 
-test('a narrow pane stacks the cards', async ($, on) => {
+test('a narrow pane stacks the cards, keeps the controls, and shows the how-to only on h', async ($, on) => {
   stubs(on)
   await start($)
   const ui = await $.ui.mount({ ...PANE, props: { ...PANE.props, bodyColumns: 40 } })
   expect(await ui.find({ key: 'cell-12' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: 'Your card' })).toBeDefined()
   expect(await ui.find({ type: 'Text', text: "Claude's card" })).toBeDefined()
+  for (const key of ['call', 'auto', 'claim', 'new', 'help']) expect(await ui.find({ key })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'How to play' })).toBeUndefined()
+  await ui.press({ key: 'help' })
+  expect(await ui.find({ type: 'Text', text: 'How to play' })).toBeDefined()
   await ui.unmount()
 })
 
@@ -296,4 +300,55 @@ test('a finished or corrupt saved game is handled', async ($, on) => {
   saved.set('game', { seed: 1, you: [1, 2] })
   await $.classic.SessionStart({ source: 'clear' })
   expect((saved.get('game') as any).you.length).toBe(25)
+})
+
+// --- First-time guidance and highlights
+
+test('a fresh game shows the how-to and the first-call prompt; a call hides the how-to and h brings it back', async ($, on) => {
+  stubs(on)
+  await start($)
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: 'How to play' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: 'Press c to call the first number.' })).toBeDefined()
+  expect(await ui.find({ type: 'Text', text: ' no call yet ' })).toBeDefined()
+  await ui.press({ key: 'call' })
+  expect(await ui.find({ type: 'Text', text: 'How to play' })).toBeUndefined()
+  expect(await ui.find({ type: 'Text', text: /^ last [BINGO]-\d+ $/ })).toBeDefined()
+  await ui.press({ key: 'help' })
+  expect(await ui.find({ type: 'Text', text: 'How to play' })).toBeDefined()
+  await ui.press({ key: 'help' })
+  expect(await ui.find({ type: 'Text', text: 'How to play' })).toBeUndefined()
+  await ui.unmount()
+})
+
+test('the status names a called number on your card until it is marked, then a full line says to shout', async ($, on) => {
+  const saved = new Map<string, unknown>()
+  const g = newGame(5, STATS, 8, false)
+  const row = [0, 1, 2, 3, 4]
+  saved.set('game', { ...g, called: row.map((p) => g.you[p]), yourMarks: [FREE, 0, 1, 2, 3] })
+  stubs(on, { saved })
+  await start($)
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: 'On your card: ' + callLabel(g.you[4]) + '. Tab or click the lit cell, then Enter to mark it.' })).toBeDefined()
+  expect(await ui.find({ key: 'cell-4', label: String(g.you[4]) })).toBeDefined()
+  expect(await ui.find({ key: 'cell-12', label: 'FREE' })).toBeDefined()
+  await ui.press({ key: 'cell-4' })
+  expect(await ui.find({ type: 'Text', text: 'You have row 1! Press b to shout Bingo.' })).toBeDefined()
+  await ui.press({ key: 'claim' })
+  expect(await ui.find({ type: 'Text', text: 'BINGO! You won with row 1. Press n for a new game.' })).toBeDefined()
+  expect((saved.get('game') as any).winner).toBe('you')
+  await ui.unmount()
+})
+
+test('when Claude has a line and you have none, the status warns you to shout first', async ($, on) => {
+  const saved = new Map<string, unknown>()
+  let g = newGame(9, STATS, 8, false)
+  g = callUntil(g, (x) => !!x.claudeLine)
+  expect(g.winner).toBeNull()
+  saved.set('game', g)
+  stubs(on, { saved })
+  await start($)
+  const ui = await $.ui.mount(PANE)
+  expect(await ui.find({ type: 'Text', text: 'Claude has ' + g.claudeLine + ' and claims at the next call. Shout first: b' })).toBeDefined()
+  await ui.unmount()
 })
