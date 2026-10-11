@@ -1,4 +1,4 @@
-export type Stats = { games: number; finished: number; bestTurns: number }
+export type Stats = { games: number; finished: number; bestTurns: number; bestMs: number }
 export type Game = {
   /** Seed of this game's shuffle; 0 until a game exists. */
   seed: number
@@ -11,6 +11,10 @@ export type Game = {
   /** Pairs of cards turned so far. */
   turns: number
   done: boolean
+  /** Time played before the current stretch, in ms. */
+  elapsedMs: number
+  /** When the current stretch of play began; null while the pane is closed or before the first card. */
+  startedAt: number | null
   stats: Stats
 }
 
