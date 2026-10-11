@@ -86,6 +86,18 @@
       ]
     },
     {
+      "name": "game-2048",
+      "source": "./mods/game-2048",
+      "description": "2048 in a pane. Slide tiles with w, a, s and d, merge equal numbers, reach 2048. One undo, a best score that survives restarts, and a board that replays from its seed. Zero tokens.",
+      "category": "fun",
+      "tags": [
+        "game",
+        "fun",
+        "pane",
+        "zero-tokens"
+      ]
+    },
+    {
       "name": "mcp-diet",
       "source": "./mods/mcp-diet",
       "description": "Choose which MCP tools and subagent types Claude sees, per project. A pane lists every server and tool with the size of its description; defer or hide the ones this repo never needs and stop paying for them on every request.",
