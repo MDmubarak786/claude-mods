@@ -25,6 +25,7 @@ body:
         - red-green
         - right-tool
         - show-paths
+        - snake
         - standup
         - style-cop
         - tripwire
