@@ -78,14 +78,26 @@ function summary(g: Game): string {
   return '2048: ' + Array.from({ length: SIZE }, (_, r) => row(r)).join(' / ') + '. Score ' + g.score + ', best ' + g.stats.best + '. ' + state + ' /2048 opens the pane.'
 }
 
-// A tile's color climbs with its value, by theme key so it follows the theme.
-function tileColor(v: number): string | undefined {
-  if (v >= GOAL) return 'claude'
-  if (v >= 512) return 'suggestion'
-  if (v >= 128) return 'success'
-  if (v >= 32) return 'error'
-  if (v >= 8) return 'warning'
-  return undefined
+// The original game's tile colors, which read the same on any theme: a board of
+// beige slots, cream for 2 and 4, orange climbing to the gold of 2048, and
+// near-black beyond it. Light text on the dark tiles, dark text on the light.
+const TILES: Record<number, [string, string]> = {
+  2: ['#eee4da', '#776e65'],
+  4: ['#ede0c8', '#776e65'],
+  8: ['#f2b179', '#f9f6f2'],
+  16: ['#f59563', '#f9f6f2'],
+  32: ['#f67c5f', '#f9f6f2'],
+  64: ['#f65e3b', '#f9f6f2'],
+  128: ['#edcf72', '#f9f6f2'],
+  256: ['#edcc61', '#f9f6f2'],
+  512: ['#edc850', '#f9f6f2'],
+  1024: ['#edc53f', '#f9f6f2'],
+  2048: ['#edc22e', '#f9f6f2'],
+}
+const EMPTY_TILE = '#cdc1b4'
+function tileStyle(v: number): [string, string] {
+  if (!v) return [EMPTY_TILE, EMPTY_TILE]
+  return TILES[v] ?? ['#3c3a32', '#f9f6f2']
 }
 
 export function register(on) {
@@ -127,7 +139,7 @@ export function register(on) {
       surfaces = []
     }
     if (!surfaces.length) return { text: summary(await read($, game)) }
-    const placed = await $.ui.open({ id: PANE, title: '2048', focus: true, closeOnEscape: true, rows: 26 })
+    const placed = await $.ui.open({ id: PANE, title: '2048', focus: true, closeOnEscape: true, rows: 32 })
     if (!placed.isPlaced) return { text: summary(await read($, game)) }
     return {}
   }).catch(async () => ({ text: '2048: the command failed.' }))
@@ -155,14 +167,15 @@ export function register(on) {
       Text({ color: status.color, bold: status.bold, wrap: 'wrap', children: [status.text] }),
     ] })
 
-    // Every tile is a fixed-width Box with the number at its right edge, so the
-    // grid lines up on any surface; the background climbs with the value.
+    // Every tile is a fixed-size Box, three rows tall and seven wide, with the
+    // number centered, so the board is a grid of near-square tiles on any
+    // surface. An empty slot is a tile of the board's own color.
     const tile = (r: number, c: number) => {
       const v = g.cells[at(r, c)]
-      const backgroundColor = tileColor(v)
-      return Box({ width: 6, justifyContent: 'flex-end', backgroundColor, children: [Text({ bold: v >= 128, color: backgroundColor ? 'inverseText' : undefined, dimColor: !v, children: [v ? String(v) : '.'] })] })
+      const [backgroundColor, color] = tileStyle(v)
+      return Box({ width: 7, height: 3, justifyContent: 'center', alignItems: 'center', backgroundColor, children: [Text({ bold: true, color, children: [v ? String(v) : ' '] })] })
     }
-    const grid = Box({ flexDirection: 'column', children: Array.from({ length: SIZE }, (_, r) => Box({ flexDirection: 'row', columnGap: 1, children: Array.from({ length: SIZE }, (_, c) => tile(r, c)) })) })
+    const grid = Box({ flexDirection: 'column', rowGap: 1, children: Array.from({ length: SIZE }, (_, r) => Box({ flexDirection: 'row', columnGap: 1, children: Array.from({ length: SIZE }, (_, c) => tile(r, c)) })) })
 
     const slideButton = (key: string, dir: Dir, label: string) =>
       Button({ key, label, hotkey: key, plain: true, onPress: async () => {

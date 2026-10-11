@@ -8,17 +8,25 @@ It's a game you play, not a watcher: it never calls a model, never reads what Cl
 2048  score 1256  best 4512 · highest 512 · move 83
 Score 1256 · best 4512
 
-     .     2     8     4
-     2    16    32    16
-     8    64   128    32
-    16   256   512    64
+  ┌─────┐┌─────┐┌─────┐┌─────┐
+  │     ││  2  ││  8  ││  4  │
+  └─────┘└─────┘└─────┘└─────┘
+  ┌─────┐┌─────┐┌─────┐┌─────┐
+  │  2  ││ 16  ││ 32  ││ 16  │
+  └─────┘└─────┘└─────┘└─────┘
+  ┌─────┐┌─────┐┌─────┐┌─────┐
+  │  8  ││ 64  ││ 128 ││ 32  │
+  └─────┘└─────┘└─────┘└─────┘
+  ┌─────┐┌─────┐┌─────┐┌─────┐
+  │ 16  ││ 256 ││ 512 ││ 64  │
+  └─────┘└─────┘└─────┘└─────┘
 
 w: Up   a: Left   s: Down   d: Right
 
 n: New game   u: Undo   h: Help   Esc closes
 ```
 
-The tiles are colored, which the text above can't show: the background climbs with the value, from plain 2s and 4s through yellow, red, green and the accent to Claude's color at 2048. Colors follow your theme.
+The tiles are colored, which the text above can't show. They use the original game's palette, so the board looks the same on any theme: beige empty slots, cream 2s and 4s, orange deepening through 8 to 64, gold from 128 to 2048, and near-black beyond. Each tile is three rows tall with its number centered.
 
 ## Install
 
