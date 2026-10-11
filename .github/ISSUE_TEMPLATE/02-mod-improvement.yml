@@ -16,6 +16,7 @@ body:
         - copy-last
         - ding
         - fence
+        - game-2048
         - mcp-diet
         - memory-lint
         - pins
