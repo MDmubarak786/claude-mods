@@ -225,6 +225,18 @@
         "guards",
         "ui"
       ]
+    },
+    {
+      "name": "xo",
+      "source": "./mods/xo",
+      "description": "Tic-tac-toe against Claude, in a pane. Press a digit to play a square; Claude answers in half a second at three levels, from beatable to perfect. Zero tokens.",
+      "category": "fun",
+      "tags": [
+        "game",
+        "fun",
+        "pane",
+        "zero-tokens"
+      ]
     }
   ]
 }

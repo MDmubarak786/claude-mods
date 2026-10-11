@@ -28,6 +28,7 @@ body:
         - trust-but-verify
         - undo-agent
         - watchtower
+        - xo
         # mods:end
     validations:
       required: true
