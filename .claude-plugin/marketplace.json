@@ -251,6 +251,18 @@
       ]
     },
     {
+      "name": "typing",
+      "source": "./mods/typing",
+      "description": "Typing race in a pane. A line of code appears, you type it; every character colors right or wrong as you go, and Enter scores words per minute and accuracy. Last ten runs and your best kept. Zero tokens.",
+      "category": "fun",
+      "tags": [
+        "game",
+        "fun",
+        "pane",
+        "zero-tokens"
+      ]
+    },
+    {
       "name": "undo-agent",
       "source": "./mods/undo-agent",
       "description": "Undo the file edits a subagent made. /rewind restores your own turns, but not a subagent's edits; this snapshots them and puts the files back with one command.",
