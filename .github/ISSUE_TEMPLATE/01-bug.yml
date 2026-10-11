@@ -23,6 +23,7 @@ body:
         - game-2048
         - mcp-diet
         - memory-lint
+        - pairs
         - pins
         - pkg-guard
         - red-green

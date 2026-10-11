@@ -1,0 +1,11 @@
+{
+  "name": "pairs",
+  "version": "0.1.0",
+  "description": "Memory pairs in a pane. Sixteen face-down cards, eight matching pairs; press a card's letter to turn it, find its twin, finish in as few turns as you can. Best score kept. Zero tokens.",
+  "author": { "name": "Mohammed Mubarak" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/pairs",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["mod", "game", "pane", "fun"],
+  "types": "./types/index.d.ts"
+}
