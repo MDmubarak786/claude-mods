@@ -121,6 +121,18 @@
       ]
     },
     {
+      "name": "pairs",
+      "source": "./mods/pairs",
+      "description": "Memory pairs in a pane. Sixteen face-down cards, eight matching pairs; press a card's letter to turn it, find its twin, finish in as few turns as you can. Best score kept. Zero tokens.",
+      "category": "fun",
+      "tags": [
+        "game",
+        "fun",
+        "pane",
+        "zero-tokens"
+      ]
+    },
+    {
       "name": "pins",
       "source": "./mods/pins",
       "description": "Pin instructions that survive compaction, /clear, and restarts. /pin saves a rule for this project and every prompt carries the pinned list as context Claude reads.",
