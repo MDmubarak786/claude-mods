@@ -1,0 +1,18 @@
+{
+  "name": "xo",
+  "version": "0.1.0",
+  "description": "Tic-tac-toe against Claude, in a pane. Press a digit to play a square; Claude answers in half a second at three levels, from beatable to perfect. Zero tokens.",
+  "author": {
+    "name": "Mohammed Mubarak"
+  },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/mods/xo",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": [
+    "mod",
+    "game",
+    "pane",
+    "fun"
+  ],
+  "types": "./types/index.d.ts"
+}
