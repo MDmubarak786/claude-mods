@@ -64,6 +64,11 @@ export function linesOf(marked: (pos: number) => boolean): string[] {
   return LINES.filter(([, cells]) => cells.every(marked)).map(([name]) => name)
 }
 
+// The cells of a named line, so the drawing can light it; [] for an unknown name.
+export function lineCells(name: string | null): number[] {
+  return LINES.find(([n]) => n === name)?.[1] ?? []
+}
+
 // Claude's marks are every called number on its card, and FREE.
 export function claudeMarked(g: Game, pos: number): boolean {
   return pos === FREE || g.called.includes(g.claude[pos])
