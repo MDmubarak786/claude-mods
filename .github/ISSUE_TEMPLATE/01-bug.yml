@@ -34,6 +34,7 @@ body:
         - style-cop
         - tripwire
         - trust-but-verify
+        - typing
         - undo-agent
         - watchtower
         - xo
