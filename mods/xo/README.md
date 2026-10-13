@@ -4,6 +4,10 @@ Tic-tac-toe against Claude, in a pane beside the conversation. Press a square's 
 
 It's a game you play, not a watcher: Claude's moves come from a few lines of rules in the mod, so it never calls a model, never reads what Claude is doing, and costs no tokens. Good for the thirty seconds while a long tool call runs.
 
+![Tic-tac-toe against Claude in a pane: you play the corners and win on the third column.](screenshots/xo.gif)
+
+*Recorded in a terminal. The Desktop app draws the same pane, with each key shown as a badge.*
+
 ```text
 XO  you X · Claude O  level normal  you 2 · Claude 1 · draws 3
 Claude played 5. Your move.

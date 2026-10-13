@@ -4,6 +4,10 @@ Connect Four against Claude, in a pane beside the conversation. Press a column's
 
 It's a game you play, not a watcher: Claude's moves come from the rules in the mod, so it never calls a model, never reads what Claude is doing, and costs no tokens.
 
+![Connect Four against Claude in a pane: four drops and a win along the bottom row.](screenshots/connect-four.gif)
+
+*Recorded in a terminal. The Desktop app draws the same pane, with each key shown as a badge.*
+
 ```text
 CONNECT FOUR  you X · Claude O  level normal  you 1 · Claude 0 · draws 0
 Claude dropped in column 4. Your move.

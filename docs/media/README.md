@@ -2,7 +2,9 @@
 
 GIFs for the top-level README and the mod READMEs. Each clip is 5 to 10 seconds, loops cleanly, and is under 5 MB so GitHub shows it inline.
 
-## Clips to record
+## Clips
+
+The hero and the six game clips are in place: `hero.gif` here, and each game's in `mods/<name>/screenshots/`. They were recorded in a terminal by a script that types the keys into a real Claude Code session, so they show exactly what the mods draw. The guard clips below still need recording.
 
 | File | Mod | What it shows |
 | :-- | :-- | :-- |

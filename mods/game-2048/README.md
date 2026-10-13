@@ -4,6 +4,10 @@
 
 It's a game you play, not a watcher: it never calls a model, never reads what Claude is doing, and costs no tokens.
 
+![2048 in a pane: two 128s merge, then two 256s make 512.](screenshots/2048.gif)
+
+*Recorded in a terminal. The Desktop app draws the same pane, with each key shown as a badge.*
+
 ```text
 2048  score 1256  best 4512 · highest 512 · move 83
 Score 1256 · best 4512

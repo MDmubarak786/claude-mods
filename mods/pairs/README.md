@@ -4,6 +4,10 @@ Memory pairs in a pane beside the conversation. Sixteen cards lie face down, eig
 
 It's a game you play, not a watcher: it never calls a model, never reads what Claude is doing, and costs no tokens. A good one for a child at the keyboard while a long turn runs.
 
+![Memory pairs in a pane: two misses, then every pair, with the clock running in the header.](screenshots/pairs.gif)
+
+*Recorded in a terminal. The Desktop app draws the same pane, with each key shown as a badge.*
+
 ```text
 PAIRS  turns 5  found 2/8  time 0:41  best 11 turns, 1:12 · game 3
 Not a pair. They turn back in a moment.

@@ -4,6 +4,10 @@ A typing race on lines of code, in a pane beside the conversation. A line appear
 
 It's a game you play, not a watcher: it never calls a model, never reads what Claude is doing, and costs no tokens. Thirty seconds of warm-up while a long turn runs.
 
+![A typing race in a pane: a typo turns red and is fixed, then Enter scores the line.](screenshots/typing.gif)
+
+*Recorded in a terminal. The Desktop app draws the same pane, with each key shown as a badge.*
+
 ```text
 TYPING  line 7/24 · best 64 wpm · 12 runs
 2 wrong so far. Backspace fixes it.
