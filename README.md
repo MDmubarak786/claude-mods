@@ -7,7 +7,7 @@
 
 **Mods add guards, panes, and games to [Claude Code](https://code.claude.com/docs/en/plugins/mods/overview): small plugins that run inside it and can refuse a risky tool call, draw a pane beside the transcript, or add a `/command`, all installed with two commands.**
 
-<!-- hero: docs/media/hero.gif. A 5 to 10 second loop: fence refusing an edit outside the fence, then a game pane (snake or 2048) open beside the transcript while Claude works. See docs/media/README.md. -->
+![Claude answers a question on the left while 2048 is played in a pane on the right](docs/media/hero.gif)
 
 This repository is a marketplace named **`modhub`**. Every mod in it is reviewed against a public checklist and installs and updates like any other plugin.
 
@@ -55,6 +55,19 @@ Seven games that open in a pane beside the transcript, so you can play while a l
 | [`pairs`](mods/pairs/) | `/pairs` | Memory pairs on a running clock, fewest turns and fastest time kept |
 | [`snake`](mods/snake/) | `/snake` | Snake, steered with w a s d |
 | [`typing`](mods/typing/) | `/typing` | A typing race on lines of code, wpm and accuracy |
+
+<table>
+<tr>
+<td><img src="mods/snake/screenshots/snake.gif" alt="Snake in a pane" width="260"></td>
+<td><img src="mods/game-2048/screenshots/2048.gif" alt="2048 in a pane" width="260"></td>
+<td><img src="mods/pairs/screenshots/pairs.gif" alt="Memory pairs with a clock" width="260"></td>
+</tr>
+<tr>
+<td><img src="mods/connect-four/screenshots/connect-four.gif" alt="Connect Four against Claude" width="260"></td>
+<td><img src="mods/xo/screenshots/xo.gif" alt="Tic-tac-toe against Claude" width="260"></td>
+<td><img src="mods/typing/screenshots/typing.gif" alt="A typing race on a line of code" width="260"></td>
+</tr>
+</table>
 
 Install one the same way, for example `/plugin install snake@modhub`.
 

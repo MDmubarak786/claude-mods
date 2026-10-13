@@ -4,6 +4,10 @@ Snake in a pane beside the conversation. Steer with **w**, **a**, **s** and **d*
 
 It's a game you play, not a watcher: it never calls a model, never reads what Claude is doing, and costs no tokens.
 
+![Snake in a pane: three turns, three meals, then a pause.](screenshots/snake.gif)
+
+*Recorded in a terminal. The Desktop app draws the same pane, with each key shown as a badge.*
+
 ```text
 SNAKE  score 4  best 12 · length 7 · 150 ms
 Eat the * and don't hit the walls or yourself.

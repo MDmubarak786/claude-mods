@@ -9,7 +9,9 @@ root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$root"
 failed=0
 
-changed_mods="$(git diff --name-only "$base"...HEAD -- mods/ | awk -F/ 'NF>1 {print $2}' | sort -u)"
+# A change to a mod's README or screenshots alone reaches nobody through the plugin, so it
+# needs no bump; any other file under the mod does.
+changed_mods="$(git diff --name-only "$base"...HEAD -- mods/ | { grep -Ev '^mods/[^/]+/(README\.md|screenshots/)' || true; } | awk -F/ 'NF>1 {print $2}' | sort -u)"
 for name in $changed_mods; do
   manifest="mods/$name/.claude-plugin/plugin.json"
   if ! git cat-file -e "$base:$manifest" 2>/dev/null; then
