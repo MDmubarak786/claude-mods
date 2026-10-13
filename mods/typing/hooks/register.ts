@@ -20,6 +20,11 @@ const game = atom({ plugin: 'typing', key: 'game' } as const, EMPTY)
 
 // The how-to block: shown until the first key, or until h has set it either way.
 let help: boolean | null = null
+// The field holds its own text and is never handed any: setting an Input's
+// value replaces what the person has typed. A new line gets a new field
+// instead, by a new key, so it starts empty without a value being drawn.
+let round = 0
+const fieldKey = () => 'typed-' + round
 // False after the store could not be read: then nothing is written over the
 // saved record until a later load reads it.
 let storeOk = true
@@ -72,6 +77,7 @@ async function load($) {
 }
 
 async function startNew($, same = false) {
+  round++
   const now = await $.clock.now()
   return change($, (cur) => (same ? { ...newGame(cur.seed, cur), snippet: cur.snippet } : newGame(now, cur)))
 }
@@ -80,7 +86,7 @@ async function startNew($, same = false) {
 async function restart($, same: boolean) {
   await startNew($, same)
   try {
-    await $.ui.focus({ requestId: PANE, key: 'typed' })
+    await $.ui.focus({ requestId: PANE, key: fieldKey() })
   } catch {
     // The field is drawn with autoFocus anyway; a refused focus is harmless.
   }
@@ -136,6 +142,10 @@ export function register(on) {
       surfaces = []
     }
     if (!surfaces.length) return { text: summary(await read($, game)) }
+    // A newly opened pane draws an empty field, so a half-typed line starts over
+    // with it; a scored run is left as it is.
+    round++
+    await change($, (cur) => (cur.result || !cur.typed ? cur : { ...cur, typed: '', startedAt: null }), false)
     const placed = await $.ui.open({ id: PANE, title: 'Typing', focus: true, closeOnEscape: true, rows: 26 })
     if (!placed.isPlaced) return { text: summary(await read($, game)) }
     return {}
@@ -190,11 +200,8 @@ export function register(on) {
     ) })
     const extra = g.typed.length > t.length ? Text({ color: 'error', children: [(g.typed.length - t.length) + ' extra character' + (g.typed.length - t.length === 1 ? '' : 's') + ' past the end'] }) : null
 
-    // The field is only told its text when the line is reset: redrawing the
-    // person's own text under them would fight the caret.
     const field = g.result ? null : Input({
-      key: 'typed',
-      value: g.typed ? undefined : '',
+      key: fieldKey(),
       placeholder: 'type here',
       submitLabel: 'score',
       autoFocus: true,

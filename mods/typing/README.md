@@ -39,7 +39,7 @@ claude --plugin-dir ./mods/typing
 2. Type the line exactly, spaces and all. The clock starts at your first key. Right characters turn green, wrong ones red; Backspace fixes them.
 3. Press Enter once you've typed the whole line. Words per minute counts the characters you got right, five to a word; accuracy is right characters over the line's length, or over what you typed if that's longer. A fragment can't be scored, so a quick five letters never sets the record. The status line says if it's your best.
 4. **n** brings the next line, **r** the same one again. Twenty-four lines rotate, never the same one twice in a row.
-5. Esc closes the pane. Scored runs are saved; a half-typed line is still there when you reopen the pane, and starts over after a restart or `/clear`.
+5. Esc closes the pane. Scored runs are saved; a half-typed line starts over when you reopen the pane, after a restart, or after `/clear`.
 
 While the field has the focus every key goes to it, so press Esc once to use **n**, **r** or **h**, or click them. After a run is scored the field goes away and Enter on the focused Next button brings the next line.
 
