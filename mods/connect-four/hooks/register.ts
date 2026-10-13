@@ -232,6 +232,10 @@ export function register(on) {
     // it is. A column's digit is its hotkey; the desktop draws a hotkey as a key
     // badge beside the label, so there the label is left blank.
     const desktop = e.surface === 'desktop'
+    // A terminal draws a Button as `[ 1 ]`, five columns, so its cells are five
+    // wide with no gap; the desktop draws a compact key badge in four plus a gap.
+    const cellWidth = desktop ? 4 : 5
+    const gap = desktop ? 1 : 0
     const landed = last >= 0 ? (() => {
       // The cell the last disc landed in: the highest filled cell of its column.
       for (let r = 0; r < ROWS; r++) if (g.cells[at(r, last)]) return at(r, last)
@@ -239,7 +243,7 @@ export function register(on) {
     })() : -1
     const dropButton = (c: number) => {
       const full = g.cells[at(0, c)] !== null
-      return Box({ width: 4, justifyContent: 'center', children: [
+      return Box({ width: cellWidth, justifyContent: 'center', children: [
         Button({ key: 'col-' + c, label: desktop ? ' ' : String(c + 1), hotkey: full ? undefined : String(c + 1), dimColor: full, onPress: async () => {
           let error: string | undefined
           const after = await change($, (cur) => {
@@ -261,11 +265,11 @@ export function register(on) {
       const m = g.cells[i]
       const lit = g.winningLine?.includes(i)
       const backgroundColor = lit ? 'suggestion' : m === g.you ? 'success' : m ? 'claude' : undefined
-      return Box({ width: 4, justifyContent: 'center', backgroundColor, children: [Text({ bold: i === landed || !!lit, color: m ? 'inverseText' : undefined, dimColor: !m, children: [m ?? '.'] })] })
+      return Box({ width: cellWidth, justifyContent: 'center', backgroundColor, children: [Text({ bold: i === landed || !!lit, color: m ? 'inverseText' : undefined, dimColor: !m, children: [m ?? '.'] })] })
     }
     const grid = Box({ flexDirection: 'column', children: [
-      Box({ flexDirection: 'row', columnGap: 1, children: Array.from({ length: COLS }, (_, c) => dropButton(c)) }),
-      ...Array.from({ length: ROWS }, (_, r) => Box({ flexDirection: 'row', columnGap: 1, children: Array.from({ length: COLS }, (_, c) => cell(r, c)) })),
+      Box({ flexDirection: 'row', columnGap: gap, children: Array.from({ length: COLS }, (_, c) => dropButton(c)) }),
+      ...Array.from({ length: ROWS }, (_, r) => Box({ flexDirection: 'row', columnGap: gap, children: Array.from({ length: COLS }, (_, c) => cell(r, c)) })),
     ] })
 
     const howTo = Box({ flexDirection: 'column', borderStyle: 'round', borderColor: 'suggestion', paddingX: 1, children: [
