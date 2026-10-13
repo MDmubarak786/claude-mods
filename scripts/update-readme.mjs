@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Regenerates the lists that mirror .claude-plugin/marketplace.json:
-//   - the mods table in README.md, between <!-- mods:start --> and <!-- mods:end -->
+//   - the mods tables in README.md, grouped by catalog category, between <!-- mods:start --> and <!-- mods:end -->
 //   - the mod dropdowns in .github/ISSUE_TEMPLATE/*.yml, between "# mods:start" and "# mods:end"
 // Usage: node scripts/update-readme.mjs          rewrite them
 //        node scripts/update-readme.mjs --check  exit 1 if any is stale
@@ -13,8 +13,14 @@ const check = process.argv.includes('--check')
 const marketplace = JSON.parse(readFileSync(join(root, '.claude-plugin/marketplace.json'), 'utf8'))
 const entries = marketplace.plugins.slice().sort((a, b) => a.name.localeCompare(b.name))
 
-// --- README table
-const rows = entries.map((entry) => {
+// --- README tables, one per group. A category no group names, such as new-mod.sh's 'other', lands in the group with no list.
+const groups = [
+  { heading: 'Guards', categories: ['safety'] },
+  { heading: 'Workflow and context', categories: null },
+  { heading: 'Games', categories: ['fun'] },
+]
+const groupOf = (entry) => groups.find((g) => g.categories?.includes(entry.category)) ?? groups.find((g) => !g.categories)
+const row = (entry) => {
   const dir = entry.source.replace(/^\.\//, '')
   let version = ''
   try {
@@ -24,13 +30,16 @@ const rows = entries.map((entry) => {
   }
   const description = (entry.description ?? '').replace(/\|/g, '\\|')
   return `| [\`${entry.name}\`](${dir}/) | ${description} | ${version} |`
+}
+const sections = groups.flatMap((group) => {
+  const members = entries.filter((entry) => groupOf(entry) === group)
+  if (!members.length) return []
+  return ['', `### ${group.heading}`, '', '| Mod | What it does | Version |', '| :-- | :-- | :-- |', ...members.map(row)]
 })
 const table = [
   '<!-- mods:start -->',
-  '<!-- This table is generated from .claude-plugin/marketplace.json by scripts/update-readme.mjs. Do not edit by hand. -->',
-  '| Mod | What it does | Version |',
-  '| :-- | :-- | :-- |',
-  ...rows,
+  '<!-- These tables are generated from .claude-plugin/marketplace.json by scripts/update-readme.mjs. Do not edit by hand. -->',
+  ...sections,
   '<!-- mods:end -->',
 ].join('\n')
 
