@@ -123,7 +123,7 @@
     {
       "name": "pairs",
       "source": "./mods/pairs",
-      "description": "Memory pairs in a pane. Sixteen face-down cards, eight matching pairs; press a card's letter to turn it, find its twin, finish in as few turns as you can. Best score kept. Zero tokens.",
+      "description": "Memory pairs in a pane. Sixteen face-down cards, eight matching pairs; press a card's letter to turn it, find its twin, finish in as few turns and as little time as you can. Best of each kept. Zero tokens.",
       "category": "fun",
       "tags": [
         "game",
