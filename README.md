@@ -126,7 +126,7 @@ claude --plugin-dir ./mods/fence
 | [`game-2048`](mods/game-2048/) | 2048 in a pane. Slide tiles with w, a, s and d, merge equal numbers, reach 2048. One undo, a best score that survives restarts, and a board that replays from its seed. Zero tokens. | 0.1.1 |
 | [`pairs`](mods/pairs/) | Memory pairs in a pane. Sixteen face-down cards, eight matching pairs; press a card's letter to turn it, find its twin, finish in as few turns and as little time as you can. Best of each kept. Zero tokens. | 0.1.1 |
 | [`snake`](mods/snake/) | Snake in a pane. Steer with w, a, s and d, eat the food, don't hit the walls or yourself. Pause with p, pick the speed, high score kept. Zero tokens. | 0.1.0 |
-| [`typing`](mods/typing/) | Typing race in a pane. A line of code appears, you type it; every character colors right or wrong as you go, and Enter scores words per minute and accuracy. Last ten runs and your best kept. Zero tokens. | 0.1.0 |
+| [`typing`](mods/typing/) | Typing race in a pane. A line of code appears, you type it; every character colors right or wrong as you go, and Enter scores words per minute and accuracy. Last ten runs and your best kept. Zero tokens. | 0.1.1 |
 | [`xo`](mods/xo/) | Tic-tac-toe against Claude, in a pane. Press a digit to play a square; Claude answers in half a second at three levels, from beatable to perfect. Zero tokens. | 0.1.0 |
 <!-- mods:end -->
 
