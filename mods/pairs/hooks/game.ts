@@ -40,19 +40,37 @@ export function shuffle(seed: number): number[] {
 }
 
 export function newGame(seed: number, stats: Stats): Game {
-  return { seed, faces: shuffle(seed), matched: new Array(CARDS).fill(false), up: [], turns: 0, done: false, stats }
+  return { seed, faces: shuffle(seed), matched: new Array(CARDS).fill(false), up: [], turns: 0, done: false, elapsedMs: 0, startedAt: null, stats }
 }
 
 export type TurnResult = { game: Game; error?: string; outcome?: 'first' | 'match' | 'miss' }
 
+// Time played so far: earlier stretches plus the running one.
+export function elapsed(g: Game, now: number): number {
+  return g.elapsedMs + (g.startedAt !== null && !g.done ? Math.max(0, now - g.startedAt) : 0)
+}
+
+// Stop the clock, folding the running stretch into the total: for a closed pane.
+export function pause(g: Game, now: number): Game {
+  if (g.startedAt === null || g.done) return g
+  return { ...g, elapsedMs: elapsed(g, now), startedAt: null }
+}
+
+export function formatMs(ms: number): string {
+  const s = Math.floor(ms / 1000)
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0')
+}
+
 // Turn a card. Two mismatched cards left up are turned back by this call first.
-export function turn(g: Game, card: number): TurnResult {
+// The clock starts at the first card and stops at the last pair.
+export function turn(g: Game, card: number, now: number): TurnResult {
   if (g.done) return { game: g, error: 'All pairs found. Press r for a new game.' }
   if (!Number.isInteger(card) || card < 0 || card >= CARDS) return { game: g, error: 'No such card.' }
   if (g.matched[card]) return { game: g, error: 'That pair is already found.' }
   let up = g.up.length === 2 ? [] : g.up
   if (up.includes(card)) return { game: g, error: 'That card is already up.' }
-  if (!up.length) return { game: { ...g, up: [card] }, outcome: 'first' }
+  const startedAt = g.startedAt ?? now
+  if (!up.length) return { game: { ...g, up: [card], startedAt }, outcome: 'first' }
   const first = up[0]
   const turns = g.turns + 1
   if (g.faces[first] === g.faces[card]) {
@@ -60,12 +78,18 @@ export function turn(g: Game, card: number): TurnResult {
     matched[first] = true
     matched[card] = true
     const done = matched.every(Boolean)
-    const stats: Stats = done
-      ? { ...g.stats, finished: g.stats.finished + 1, bestTurns: g.stats.bestTurns ? Math.min(g.stats.bestTurns, turns) : turns }
-      : g.stats
-    return { game: { ...g, matched, up: [], turns, done, stats }, outcome: 'match' }
+    if (!done) return { game: { ...g, matched, up: [], turns, startedAt }, outcome: 'match' }
+    // At least a millisecond, since 0 means no time recorded.
+    const ms = Math.max(1, elapsed({ ...g, startedAt }, now))
+    const stats: Stats = {
+      ...g.stats,
+      finished: g.stats.finished + 1,
+      bestTurns: g.stats.bestTurns ? Math.min(g.stats.bestTurns, turns) : turns,
+      bestMs: g.stats.bestMs ? Math.min(g.stats.bestMs, ms) : ms,
+    }
+    return { game: { ...g, matched, up: [], turns, done: true, elapsedMs: ms, startedAt: null, stats }, outcome: 'match' }
   }
-  return { game: { ...g, up: [first, card], turns }, outcome: 'miss' }
+  return { game: { ...g, up: [first, card], turns, startedAt }, outcome: 'miss' }
 }
 
 // Turn a mismatched pair back down.
@@ -84,6 +108,6 @@ export function isGame(x: unknown): x is Game {
   return typeof g.seed === 'number' && Array.isArray(g.faces) && g.faces.length === CARDS && g.faces.every((f) => Number.isInteger(f) && f >= 0 && f < FACES.length) &&
     Array.isArray(g.matched) && g.matched.length === CARDS && g.matched.every((m) => typeof m === 'boolean') &&
     Array.isArray(g.up) && g.up.length <= 2 && g.up.every((c) => Number.isInteger(c) && c >= 0 && c < CARDS) &&
-    Number.isInteger(g.turns) && typeof g.done === 'boolean' &&
-    !!stats && typeof stats === 'object' && ['games', 'finished', 'bestTurns'].every((k) => Number.isInteger(stats[k]))
+    Number.isInteger(g.turns) && typeof g.done === 'boolean' && Number.isInteger(g.elapsedMs) && (g.startedAt === null || typeof g.startedAt === 'number') &&
+    !!stats && typeof stats === 'object' && ['games', 'finished', 'bestTurns', 'bestMs'].every((k) => Number.isInteger(stats[k]))
 }
