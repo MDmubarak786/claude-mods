@@ -4,7 +4,7 @@ GIFs for the top-level README and the mod READMEs. Each clip is 5 to 10 seconds,
 
 ## Clips
 
-The hero and the six game clips are in place: `hero.gif` here, and each game's in `mods/<name>/screenshots/`. They were recorded in a terminal by a script that types the keys into a real Claude Code session, so they show exactly what the mods draw. The guard clips below still need recording.
+The hero and the seven game clips are in place: `hero.gif` here, and each game's in `mods/<name>/screenshots/`. They were recorded in a terminal by a script that types the keys into a real Claude Code session, so they show exactly what the mods draw. The guard clips below still need recording.
 
 | File | Mod | What it shows |
 | :-- | :-- | :-- |
@@ -14,6 +14,7 @@ The hero and the six game clips are in place: `hero.gif` here, and each game's i
 | `fence.gif` | fence | `/fence src/`, then ask Claude to change a file outside `src/`. The edit is refused with the reason, and Claude explains instead of editing. |
 | `tripwire.gif` | tripwire | Ask Claude to put a key in a config file. The edit is held with the question, the default answer is refuse, and the secret itself is never printed. |
 | `pairs.gif` | pairs | `/pairs`, a few turns by letter, one match, and the clock running in the header. |
+| `bingo.gif` | bingo | `/bingo` on a game one call from the end: the call completes your row and Claude's, Claude's line glows red and waits a call, you mark the number and shout Bingo first. |
 
 Before recording:
 
