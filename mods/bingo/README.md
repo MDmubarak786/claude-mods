@@ -4,6 +4,10 @@ Classic 75-ball bingo, you against Claude, in a pane beside the conversation. Nu
 
 It's a game you play, not a watcher: it never calls a model, never reads what Claude is doing, and costs no tokens. Call numbers yourself, or turn on Auto and let them come every few seconds while Claude works.
 
+![Bingo against Claude in a pane: one call completes your row 1 and Claude's row 2, Claude's line waits a call, and you shout first.](screenshots/bingo.gif)
+
+*Recorded in a terminal. The Desktop app draws the same pane, with each key shown as a badge.*
+
 ```text
 BINGO  you vs Claude  called 23/75  [ last G-52 ]
 recent: B-7  N-33  O-68  I-21  G-52

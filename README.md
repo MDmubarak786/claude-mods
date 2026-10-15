@@ -67,6 +67,9 @@ Seven games that open in a pane beside the transcript, so you can play while a l
 <td><img src="mods/xo/screenshots/xo.gif" alt="Tic-tac-toe against Claude" width="260"></td>
 <td><img src="mods/typing/screenshots/typing.gif" alt="A typing race on a line of code" width="260"></td>
 </tr>
+<tr>
+<td><img src="mods/bingo/screenshots/bingo.gif" alt="Bingo against Claude, shouting first" width="260"></td>
+</tr>
 </table>
 
 Install one the same way, for example `/plugin install snake@modhub`.
