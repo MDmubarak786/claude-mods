@@ -19,6 +19,7 @@ body:
         - connect-four
         - copy-last
         - ding
+        - dino
         - fence
         - game-2048
         - mcp-diet

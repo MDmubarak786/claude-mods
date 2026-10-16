@@ -75,6 +75,18 @@
       ]
     },
     {
+      "name": "dino",
+      "source": "./mods/dino",
+      "description": "The Chrome dinosaur runner in a pane. Press w to jump the cacti; the ground speeds up as you go, and your best distance is kept. Zero tokens.",
+      "category": "fun",
+      "tags": [
+        "game",
+        "fun",
+        "pane",
+        "zero-tokens"
+      ]
+    },
+    {
       "name": "fence",
       "source": "./mods/fence",
       "description": "Limit which paths Claude may edit in a project with one /fence command. Edits outside the fence are refused with a reason Claude can act on.",
