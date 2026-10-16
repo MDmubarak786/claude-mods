@@ -239,6 +239,18 @@
       ]
     },
     {
+      "name": "sudoku",
+      "source": "./mods/sudoku",
+      "description": "Sudoku in a pane. Three levels with one solution each, move with w a s d, type a digit, undo, a hint when stuck, and a clock that pauses when the pane closes. Best time per level kept. Zero tokens.",
+      "category": "fun",
+      "tags": [
+        "game",
+        "fun",
+        "pane",
+        "zero-tokens"
+      ]
+    },
+    {
       "name": "tripwire",
       "source": "./mods/tripwire",
       "description": "Stop secrets leaving the machine. Holds an edit or command that writes an API key, a private key, or a credential literal, a command that reads a secret file and talks to the network, and a git commit whose staged changes contain a secret. Refuses by default.",

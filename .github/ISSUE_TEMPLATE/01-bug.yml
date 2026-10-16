@@ -33,6 +33,7 @@ body:
         - snake
         - standup
         - style-cop
+        - sudoku
         - tripwire
         - trust-but-verify
         - typing
