@@ -4,7 +4,7 @@ GIFs for the top-level README and the mod READMEs. Each clip is 5 to 10 seconds,
 
 ## Clips
 
-The hero and the seven game clips are in place: `hero.gif` here, and each game's in `mods/<name>/screenshots/`. They were recorded in a terminal by a script that types the keys into a real Claude Code session, so they show exactly what the mods draw. The guard clips below still need recording.
+The hero and the nine game clips are in place: `hero.gif` here, and each game's in `mods/<name>/screenshots/`. They were recorded in a terminal by a script that types the keys into a real Claude Code session, so they show exactly what the mods draw. The guard clips below still need recording.
 
 | File | Mod | What it shows |
 | :-- | :-- | :-- |
@@ -15,6 +15,8 @@ The hero and the seven game clips are in place: `hero.gif` here, and each game's
 | `tripwire.gif` | tripwire | Ask Claude to put a key in a config file. The edit is held with the question, the default answer is refuse, and the secret itself is never printed. |
 | `pairs.gif` | pairs | `/pairs`, a few turns by letter, one match, and the clock running in the header. |
 | `bingo.gif` | bingo | `/bingo` on a game one call from the end: the call completes your row and Claude's, Claude's line glows red and waits a call, you mark the number and shout Bingo first. |
+| `dino.gif` | dino | `/dino` with two cacti already coming: a jump clears the small one and a late jump clears the tall one, then the third arrives unjumped and the run ends on the red border with the toast. |
+| `sudoku.gif` | sudoku | `/sudoku` on a normal puzzle with four cells left at 7:22: a wrong digit turns red, 0 clears it, the right digits go in with the cursor moving between cells, and the grid turns green at 7:29. |
 
 Before recording:
 

@@ -4,6 +4,10 @@ The dinosaur runner in a pane beside the conversation, the one Chrome shows when
 
 It's a game you play, not a watcher: it never calls a model, never reads what Claude is doing, and costs no tokens. Chrome gave you a dinosaur for when the connection was down; this one is for when Claude is thinking.
 
+![The dinosaur runner in a pane: a jump over a small cactus, a late jump over a tall one, then a crash.](screenshots/dino.gif)
+
+*Recorded in a terminal. The Desktop app draws the same pane, with each key shown as a badge.*
+
 ```text
 DINO  score 00142  HI 00388 · 110 ms
 A tall cactus ahead: jump at the last moment to clear it.

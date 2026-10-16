@@ -4,6 +4,10 @@ Sudoku in a pane beside the conversation. Every puzzle is dealt from a seed and 
 
 It's a game you play, not a watcher: it never calls a model, never reads what Claude is doing, and costs no tokens. A puzzle takes longer than most of Claude's turns, so it waits for you.
 
+![Sudoku in a pane: the last four cells, a wrong digit in red, then the grid turns green.](screenshots/sudoku.gif)
+
+*Recorded in a terminal. The Desktop app draws the same pane, with each key shown as a badge.*
+
 ```text
 SUDOKU  level normal  filled 51/81  time 4:12  best 11:40 · game 3
 51 of 81 filled. u takes an entry back, g fills the cell you are on.

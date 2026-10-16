@@ -71,6 +71,8 @@ Nine games that open in a pane beside the transcript, so you can play while a lo
 </tr>
 <tr>
 <td><img src="mods/bingo/screenshots/bingo.gif" alt="Bingo against Claude, shouting first" width="260"></td>
+<td><img src="mods/dino/screenshots/dino.gif" alt="The dinosaur runner jumping cacti" width="260"></td>
+<td><img src="mods/sudoku/screenshots/sudoku.gif" alt="Sudoku, the last four cells and a solve" width="260"></td>
 </tr>
 </table>
 
