@@ -44,7 +44,7 @@ Run `/reload-plugins`, then `/plugin`: its `mods active` line names the three.
 
 ## Play while Claude works
 
-Eight games that open in a pane beside the transcript, so you can play while a long turn runs. They never call the model, so they cost **zero tokens**.
+Nine games that open in a pane beside the transcript, so you can play while a long turn runs. They never call the model, so they cost **zero tokens**.
 
 | Game | Command | What it is |
 | :-- | :-- | :-- |
@@ -55,6 +55,7 @@ Eight games that open in a pane beside the transcript, so you can play while a l
 | [`game-2048`](mods/game-2048/) | `/2048` | 2048 with one undo and a best score |
 | [`pairs`](mods/pairs/) | `/pairs` | Memory pairs on a running clock, fewest turns and fastest time kept |
 | [`snake`](mods/snake/) | `/snake` | Snake, steered with w a s d |
+| [`sudoku`](mods/sudoku/) | `/sudoku` | Sudoku with one solution per puzzle, three levels, a clock and hints |
 | [`typing`](mods/typing/) | `/typing` | A typing race on lines of code, wpm and accuracy |
 
 <table>
@@ -144,6 +145,7 @@ claude --plugin-dir ./mods/fence
 | [`game-2048`](mods/game-2048/) | 2048 in a pane. Slide tiles with w, a, s and d, merge equal numbers, reach 2048. One undo, a best score that survives restarts, and a board that replays from its seed. Zero tokens. | 0.1.1 |
 | [`pairs`](mods/pairs/) | Memory pairs in a pane. Sixteen face-down cards, eight matching pairs; press a card's letter to turn it, find its twin, finish in as few turns and as little time as you can. Best of each kept. Zero tokens. | 0.1.1 |
 | [`snake`](mods/snake/) | Snake in a pane. Steer with w, a, s and d, eat the food, don't hit the walls or yourself. Pause with p, pick the speed, high score kept. Zero tokens. | 0.1.0 |
+| [`sudoku`](mods/sudoku/) | Sudoku in a pane. Three levels with one solution each, move with w a s d, type a digit, undo, a hint when stuck, and a clock that pauses when the pane closes. Best time per level kept. Zero tokens. | 0.1.0 |
 | [`typing`](mods/typing/) | Typing race in a pane. A line of code appears, you type it; every character colors right or wrong as you go, and Enter scores words per minute and accuracy. Last ten runs and your best kept. Zero tokens. | 0.1.1 |
 | [`xo`](mods/xo/) | Tic-tac-toe against Claude, in a pane. Press a digit to play a square; Claude answers in half a second at three levels, from beatable to perfect. Zero tokens. | 0.1.0 |
 <!-- mods:end -->
