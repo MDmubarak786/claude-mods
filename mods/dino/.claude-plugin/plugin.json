@@ -1,6 +1,6 @@
 {
   "name": "dino",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The Chrome dinosaur runner in a pane. Press w to jump the cacti; the ground speeds up as you go, and your best distance is kept. Zero tokens.",
   "author": {
     "name": "Mohammed Mubarak"

@@ -4,24 +4,42 @@ The dinosaur runner in a pane beside the conversation, the one Chrome shows when
 
 It's a game you play, not a watcher: it never calls a model, never reads what Claude is doing, and costs no tokens. Chrome gave you a dinosaur for when the connection was down; this one is for when Claude is thinking.
 
-![The dinosaur runner in a pane: a jump over a small cactus, a late jump over a tall one, then a crash.](screenshots/dino.gif)
+![The dinosaur runner shrine in a pane: three timed jumps clear three cacti, then a crash and a new high score.](screenshots/dino.gif)
 
 *Recorded in a terminal. The Desktop app draws the same pane, with each key shown as a badge.*
 
-```text
-DINO  score 00142  HI 00388 · 110 ms
-A tall cactus ahead: jump at the last moment to clear it.
-┌────────────────────────────────────────────────────────────┐
-│                                                            │
-│        D                                 #                 │
-│. . . . . . . . . . . . . . . . . . . . . # . . . . # # . . │
-└────────────────────────────────────────────────────────────┘
-w: Jump   p: Pause
+The pane is a 1998 fan page devoted to the dinosaur: stars behind everything, a block-letter banner, the game in a centred table, marching dividers between the sections, and a hit counter that is really your games played.
 
-n: New game   h: Help   Esc closes and pauses
+```text
+  .  *  .   *  .  *  + .   *  .  *
+          ██  ███ █  █  ██
+          █ █  █  ██ █ █  █
+          █ █  █  █ ██ █  █
+          █ █  █  █  █ █  █
+          ██  ███ █  █  ██
+      *~* the dinosaur runner shrine *~*
+   ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+  ╔════════════════════════════════════════╗
+  ║ SCORE 00043  HI 00043 · 120 ms  ▰▰▰▰▱▱ ║
+  ║ .    + .      .      + .      .    + . ║
+  ║                    ^                   ║
+  ║     o              |           ^       ║
+  ║    <|              |           |       ║
+  ║ - .- . - .- . - .- . - .- . - .- . - . ║
+  ╚════════════════════════════════════════╝
+     A tall cactus ahead: jump at the last
+              moment to clear it.
+   ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+            [ w: Jump ] [ p: Pause ]
+   ~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
+       You are visitor No. 0 0 0 0 0 1
+            Best run 0 0 0 4 3 steps
+  .  *  .   *  .  *  + .   *  .  *
+        [ n: New game ] [ h: Help ]
+            Esc closes and pauses
 ```
 
-The lane is colored, which the text above can't show: the dinosaur is a `D` on green that turns red when you crash, the cacti are `#` on yellow, and the border turns red at the end of a run. Colors follow your theme.
+The picture is in colour, which the text above can't show: navy with purple and yellow stars, a hot-pink banner, the dinosaur in lime green with its eye and tail, orange cacti, cyan links and border. A crash turns the dinosaur and the border red and a new best blinks `*NEW HIGH SCORE*` over the status line. The colours are the web-safe inks of the era and don't follow your theme; the speed meter under the score fills toward the next 100-point ramp.
 
 ## Install
 
@@ -69,15 +87,16 @@ calls: $.clock.every (via startTimer), $.clock.now (via load, startNew), $.comma
 
 ## Tested with
 
-- Claude Code 2.1.301, `claude plugin validate --strict` and `claude plugin test` passing: the rules (the waiting start, the jump arc, a press in the air, cacti spawning and walking off, the speed ramp, the clearing windows for small and tall cacti, landing on one, standing still), a player who jumps at the last moment surviving 3,000 steps on each of 20 seeds, the record, the guard, and mounted pane tests on the mock clock for jumping, scrolling, pausing, the faster clock at 100 points, crashing and the toast, the commands, an unreadable store, and a narrow pane. The test kit can't fire `ui.close`, so pausing on close is covered by the pause key and the load path.
-- Not yet looked at in the Desktop app. The lane is built from the same two-column `Box`es as `snake`, which draws correctly there.
+- Claude Code 2.1.303, `claude plugin validate --strict` and `claude plugin test` passing: the rules (the waiting start, the jump arc, a press in the air, cacti spawning and walking off, the speed ramp, the clearing windows for small and tall cacti, landing on one, standing still), a player who jumps at the last moment surviving 3,000 steps on each of 20 seeds, the record, the guard, and mounted pane tests on the mock clock for jumping, scrolling, pausing, the faster clock at 100 points, crashing and the toast, the commands, an unreadable store, and a narrow pane. The test kit can't fire `ui.close`, so pausing on close is covered by the pause key and the load path.
+- The 0.1.1 drawing was recorded in a terminal (the GIF above) at a 40-column pane, where every cell is one column wide; at 62 columns and up the cells are two wide. Not yet looked at in the Desktop app, which draws the same fixed-width cells as `bingo` and `game-2048` do there.
 
 ## Limitations
 
 - One game at a time per machine. Two sessions playing at once overwrite each other; the last write wins.
 - Only cacti so far: no birds, and no ducking. The arrow keys and the space bar are not hotkeys a mod can take; **w** is.
 - The spacing between cacti is at least a jump plus three steps, so every run can go on forever in principle. The clock is what beats you.
-- The lane redraws on every step, 90 cells at a time. At 60 ms on a slow terminal it may stutter.
+- The whole page redraws on every step, about 350 cells at a time, so the dividers and stars can move with the clock. At 60 ms on a slow terminal it may stutter.
+- The colours are fixed web-safe inks, not your theme's, so the pane looks the same on every theme; a light terminal theme gets a navy page in the middle of it.
 
 ## License
 
