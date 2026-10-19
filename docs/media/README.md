@@ -15,7 +15,7 @@ The hero and the nine game clips are in place: `hero.gif` here, and each game's 
 | `tripwire.gif` | tripwire | Ask Claude to put a key in a config file. The edit is held with the question, the default answer is refuse, and the secret itself is never printed. |
 | `pairs.gif` | pairs | `/pairs`, a few turns by letter, one match, and the clock running in the header. |
 | `bingo.gif` | bingo | `/bingo` on a game one call from the end: the call completes your row and Claude's, Claude's line glows red and waits a call, you mark the number and shout Bingo first. |
-| `dino.gif` | dino | `/dino` with two cacti already coming: a jump clears the small one and a late jump clears the tall one, then the third arrives unjumped and the run ends on the red border with the toast. |
+| `dino.gif` | dino | `/dino` opens the shrine: the banner, the star tile and the table, then three timed jumps clear three cacti and the fourth lands the run at 76, the border and dinosaur turn red and `*NEW HIGH SCORE*` appears. |
 | `sudoku.gif` | sudoku | `/sudoku` on a normal puzzle with four cells left at 7:22: a wrong digit turns red, 0 clears it, the right digits go in with the cursor moving between cells, and the grid turns green at 7:29. |
 
 Before recording:

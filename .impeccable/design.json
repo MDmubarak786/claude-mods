@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-19T00:00:00Z",
+  "title": "Design System: Dino Shrine '98",
+  "scope": "The dino pane only (mods/dino/hooks/register.ts). Not a system for the other mods in this repository.",
+  "extensions": {
+    "platform": "Claude Code pane drawn from Box, Text and Button primitives; rendered by a terminal and by the Desktop app from one tree. No CSS, fonts, px, shadows or breakpoints. Tokens are hex inks, cell widths in character columns, ASCII glyphs of at most two characters, and borderStyle names.",
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "Shrine Navy",
+        "canonical": "#000033",
+        "purpose": "Page background and the background of every star, divider and banner cell."
+      },
+      "star": {
+        "role": "neutral",
+        "displayName": "Fan Purple",
+        "canonical": "#8800ff",
+        "purpose": "The . and + stars; the far stars on the lane's top row. Outside the web-safe register by the world's choice."
+      },
+      "starBright": {
+        "role": "neutral",
+        "displayName": "Star Yellow",
+        "canonical": "#ffea00",
+        "purpose": "The * stars only. Outside the web-safe register by the world's choice."
+      },
+      "banner": {
+        "role": "primary",
+        "displayName": "Hot Pink",
+        "canonical": "#ff66cc",
+        "purpose": "DINO block letters, the record notice, the help heading."
+      },
+      "bannerDark": {
+        "role": "primary",
+        "displayName": "Pink Shadow",
+        "canonical": "#cc33aa",
+        "purpose": "The bottom row of the banner. Outside the web-safe register by the world's choice."
+      },
+      "text": {
+        "role": "secondary",
+        "displayName": "Visitor Yellow",
+        "canonical": "#ffff66",
+        "purpose": "SCORE label, HI readout, counter digits, tagline, warning and paused status."
+      },
+      "link": {
+        "role": "primary",
+        "displayName": "Shrine Cyan",
+        "canonical": "#66ffff",
+        "purpose": "Controls as links, lit meter segments, invitation status."
+      },
+      "border": {
+        "role": "primary",
+        "displayName": "Shrine Cyan",
+        "canonical": "#66ffff",
+        "purpose": "The table's double border at rest."
+      },
+      "box": {
+        "role": "neutral",
+        "displayName": "Table Navy",
+        "canonical": "#000066",
+        "purpose": "Header cell and counter digit boxes."
+      },
+      "white": {
+        "role": "secondary",
+        "displayName": "Pure White",
+        "canonical": "#ffffff",
+        "purpose": "The live score value and the counter prose."
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Lilac",
+        "canonical": "#cc99ff",
+        "purpose": "Secondary prose: steps, Esc note, help footnote."
+      },
+      "cell": {
+        "role": "neutral",
+        "displayName": "Lane Black",
+        "canonical": "#000000",
+        "purpose": "The lane; glyph ink on dinosaur and cactus cells."
+      },
+      "dino": {
+        "role": "tertiary",
+        "displayName": "Dino Lime",
+        "canonical": "#00ff99",
+        "purpose": "The dinosaur's cells and tail."
+      },
+      "dead": {
+        "role": "tertiary",
+        "displayName": "Crash Red",
+        "canonical": "#ff3366",
+        "purpose": "Dinosaur, table border and status when the run is over."
+      },
+      "cactus": {
+        "role": "tertiary",
+        "displayName": "Cactus Orange",
+        "canonical": "#ff9933",
+        "purpose": "Every cactus cell."
+      },
+      "dirt": {
+        "role": "neutral",
+        "displayName": "Dirt",
+        "canonical": "#333366",
+        "purpose": "Ground strip; unlit meter segments."
+      },
+      "dirtLit": {
+        "role": "neutral",
+        "displayName": "Dirt Lit",
+        "canonical": "#9999cc",
+        "purpose": "Ground grain and landing dust."
+      },
+      "divA": {
+        "role": "primary",
+        "displayName": "Hot Pink",
+        "canonical": "#ff66cc",
+        "purpose": "Alternate divider cells."
+      },
+      "divB": {
+        "role": "primary",
+        "displayName": "Shrine Cyan",
+        "canonical": "#66ffff",
+        "purpose": "Alternate divider cells."
+      }
+    },
+    "typographyMeta": {
+      "note": "Not applicable: character-cell pane. The only type properties set are bold and dimColor on Text."
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "step",
+        "value": "120 ms at start, 10 ms faster every 100 points, floor 60 ms",
+        "purpose": "The game clock; one redraw per step. Nothing moves while paused or over."
+      },
+      {
+        "name": "divider-march",
+        "value": "1 cell per step",
+        "purpose": "Dividers advance with the score; the three on the page are out of phase (score, score+1, score)."
+      },
+      {
+        "name": "ground-scroll",
+        "value": "1 cell per step",
+        "purpose": "The 8-step GROUND_TILE grain advances with the score."
+      },
+      {
+        "name": "star-drift",
+        "value": "1 cell per 4 steps",
+        "purpose": "Star rows and the lane's far stars shift by floor(score / 4); the three rows sample the tile at phase, phase+5, phase+3."
+      },
+      {
+        "name": "leg-alternate",
+        "value": "odd scores while running",
+        "purpose": "Legs read |\\ on even scores and /\\ on odd ones; \\/ through a jump."
+      },
+      {
+        "name": "record-blink",
+        "value": "shown on even scores",
+        "purpose": "*NEW HIGH SCORE* blinks while the run continues and holds steady once it is over."
+      },
+      {
+        "name": "landing-dust",
+        "value": "1 drawing",
+        "purpose": ".: in dirtLit one column behind the dinosaur on the frame after a jump's last arc step."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wide-cells",
+        "value": "62 body columns",
+        "purpose": "Cells are 2 columns wide at or above this and 1 below; the picture is 60 or 30 columns across."
+      },
+      {
+        "name": "auto-help",
+        "value": "50 body columns",
+        "purpose": "The FAQ section opens on a fresh game at or above this width."
+      },
+      {
+        "name": "pane-rows",
+        "value": "32 rows",
+        "purpose": "The rows the pane requests from ui.open."
+      }
+    ],
+    "platformConstraints": [
+      "The Desktop collapses whitespace: alignment comes from Box width and backgroundColor, never from padded text or leading spaces.",
+      "The Desktop draws non-ASCII glyphs in a wider fallback face: cell glyphs are ASCII, at most cw characters.",
+      "The Desktop draws a Button's hotkey as a key badge: the terminal's [ ] brackets around links become a | separator there.",
+      "Theme colour keys and hex both work on the Desktop; this world uses hex only."
+    ]
+  },
+  "components": [
+    {
+      "name": "Cell",
+      "kind": "custom",
+      "refersTo": "cell-lane",
+      "description": "Panel preview of a character cell; the project has no CSS. A fixed-width Box with a background and at most two ASCII characters.",
+      "html": "<span class=\"ds-row\"><span class=\"ds-cell ds-cell-star\">.</span><span class=\"ds-cell ds-cell-star\"> </span><span class=\"ds-cell ds-cell-star\"> </span><span class=\"ds-cell ds-cell-star-bright\">*</span><span class=\"ds-cell ds-cell-star\"> </span><span class=\"ds-cell ds-cell-star\"> </span><span class=\"ds-cell ds-cell-star\">+</span></span>",
+      "css": ".ds-row { display: inline-flex; font-family: ui-monospace, Menlo, monospace; font-size: 14px; line-height: 1.2; } .ds-cell { display: inline-block; width: 2ch; text-align: left; white-space: pre; } .ds-cell-star { background: #000033; color: #8800ff; } .ds-cell-star-bright { background: #000033; color: #ffea00; }"
+    },
+    {
+      "name": "Divider",
+      "kind": "custom",
+      "refersTo": "cell-divider-a",
+      "description": "Panel preview; the project has no CSS. Thirty ~- cells alternating pink and cyan, marching one cell per clock step.",
+      "html": "<span class=\"ds-row\"><span class=\"ds-cell ds-div-b\">~-</span><span class=\"ds-cell ds-div-a\">~-</span><span class=\"ds-cell ds-div-b\">~-</span><span class=\"ds-cell ds-div-a\">~-</span><span class=\"ds-cell ds-div-b\">~-</span><span class=\"ds-cell ds-div-a\">~-</span><span class=\"ds-cell ds-div-b\">~-</span><span class=\"ds-cell ds-div-a\">~-</span></span>",
+      "css": ".ds-row { display: inline-flex; font-family: ui-monospace, Menlo, monospace; font-size: 14px; line-height: 1.2; } .ds-cell { display: inline-block; width: 2ch; white-space: pre; } .ds-div-a { background: #000033; color: #ff66cc; } .ds-div-b { background: #000033; color: #66ffff; }"
+    },
+    {
+      "name": "Table header",
+      "kind": "card",
+      "refersTo": "table-header",
+      "description": "Panel preview; the project has no CSS. The score cell at the top of the double-bordered table: yellow label, white live value, HI readout, ten-segment meter.",
+      "html": "<div class=\"ds-table\"><div class=\"ds-header\"><span class=\"ds-label\">SCORE</span><span class=\"ds-value\">00059</span><span class=\"ds-hi\">HI 00059 · 120 ms</span><span class=\"ds-meter\"><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i class=\"on\"></i><i></i><i></i><i></i><i></i><i></i></span></div><div class=\"ds-lane\"><span class=\"ds-cell\"> </span><span class=\"ds-cell\"> </span><span class=\"ds-cell\"> </span><span class=\"ds-cell\"> </span><span class=\"ds-cell ds-dino\">o&gt;</span><span class=\"ds-cell\"> </span><span class=\"ds-cell\"> </span><span class=\"ds-cell\"> </span><span class=\"ds-cell\"> </span><span class=\"ds-cell ds-cactus\">/\\</span></div><div class=\"ds-lane\"><span class=\"ds-cell\"> </span><span class=\"ds-cell\"> </span><span class=\"ds-cell\"> </span><span class=\"ds-cell ds-dino\">&lt;=</span><span class=\"ds-cell ds-dino\">|\\</span><span class=\"ds-cell\"> </span><span class=\"ds-cell\"> </span><span class=\"ds-cell\"> </span><span class=\"ds-cell\"> </span><span class=\"ds-cell ds-cactus\">||</span></div><div class=\"ds-ground\"><span class=\"ds-cell\">-</span><span class=\"ds-cell\"> </span><span class=\"ds-cell\">.</span><span class=\"ds-cell\"> </span><span class=\"ds-cell\">-</span><span class=\"ds-cell\"> </span><span class=\"ds-cell\"> </span><span class=\"ds-cell\">.</span><span class=\"ds-cell\">-</span><span class=\"ds-cell\"> </span></div></div>",
+      "css": ".ds-table { display: inline-block; border: 3px double #66ffff; background: #000000; font-family: ui-monospace, Menlo, monospace; font-size: 14px; line-height: 1.2; } .ds-header { display: flex; gap: 2ch; align-items: center; padding: 0 1ch; background: #000066; } .ds-label { color: #ffff66; font-weight: 700; } .ds-value { color: #ffffff; font-weight: 700; } .ds-hi { color: #ffff66; } .ds-meter { display: inline-flex; } .ds-meter i { display: inline-block; width: 1ch; height: 1.2em; background: #333366; } .ds-meter i.on { background: #66ffff; } .ds-lane, .ds-ground { display: flex; } .ds-cell { display: inline-block; width: 2ch; white-space: pre; color: #000000; } .ds-dino { background: #00ff99; color: #000000; font-weight: 700; } .ds-cactus { background: #ff9933; color: #000000; } .ds-ground { background: #333366; } .ds-ground .ds-cell { color: #9999cc; }"
+    },
+    {
+      "name": "Link (primary)",
+      "kind": "button",
+      "refersTo": "link-primary",
+      "description": "Panel preview; the project has no CSS. A plain Button with a hotkey, drawn as w: Jump between cyan brackets in the terminal. Jump is the only link at full strength.",
+      "html": "<span class=\"ds-links\"><span class=\"ds-bracket\">[</span><button class=\"ds-link ds-link-primary\">w: Jump</button><span class=\"ds-bracket\">] [</span><button class=\"ds-link ds-link-dim\">p: Pause</button><span class=\"ds-bracket\">]</span></span>",
+      "css": ".ds-links { display: inline-flex; gap: 2ch; align-items: center; background: #000033; padding: 0 1ch; font-family: ui-monospace, Menlo, monospace; font-size: 14px; } .ds-bracket { color: #66ffff; } .ds-link { background: none; border: 0; padding: 0; font: inherit; color: #66ffff; cursor: pointer; } .ds-link-dim { opacity: 0.6; } .ds-link:hover, .ds-link:focus-visible { background: #66ffff; color: #000033; outline: none; }"
+    },
+    {
+      "name": "Hit counter",
+      "kind": "custom",
+      "refersTo": "counter-digit",
+      "description": "Panel preview; the project has no CSS. Every digit in its own navy box with a bold yellow glyph; the games count is the visitor number.",
+      "html": "<span class=\"ds-counter\"><span class=\"ds-counter-label\">You are visitor No.</span><span class=\"ds-digits\"><span class=\"ds-digit\">0</span><span class=\"ds-digit\">0</span><span class=\"ds-digit\">0</span><span class=\"ds-digit\">0</span><span class=\"ds-digit\">0</span><span class=\"ds-digit\">1</span></span></span>",
+      "css": ".ds-counter { display: inline-flex; gap: 1ch; align-items: center; background: #000033; font-family: ui-monospace, Menlo, monospace; font-size: 14px; } .ds-counter-label { color: #ffffff; } .ds-digits { display: inline-flex; } .ds-digit { display: inline-block; width: 3ch; text-align: center; background: #000066; color: #ffff66; font-weight: 700; }"
+    },
+    {
+      "name": "Record notice",
+      "kind": "chip",
+      "refersTo": "cell-banner",
+      "description": "Panel preview; the project has no CSS. *NEW HIGH SCORE* in bold pink before the status line; blinks on even scores while running, steady when over.",
+      "html": "<span class=\"ds-notice\"><span class=\"ds-record\">*NEW HIGH SCORE*</span><span class=\"ds-status-dead\">Game over at 76, a new best. Press n for a new game.</span></span>",
+      "css": ".ds-notice { display: inline-flex; flex-wrap: wrap; gap: 1ch; justify-content: center; background: #000033; padding: 0 1ch; font-family: ui-monospace, Menlo, monospace; font-size: 14px; } .ds-record { color: #ff66cc; font-weight: 700; } .ds-status-dead { color: #ff3366; font-weight: 700; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Dinosaur's Fan Page",
+    "overview": "The pane is a 1998 single-subject fan page devoted to the dinosaur, and the game is the shrine's centrepiece. The page is a star-tiled navy ground; the name DINO sits at the top in hot-pink block letters; the lane runs inside a centred, double-bordered table; marching ~ dividers separate every section; and the bottom carries a hit counter that is really your games played. It refuses the category default of a bare lane with a status line above it.\n\nThis is not a web page. The surface is a Claude Code pane drawn from Box, Text and Button primitives, rendered by a terminal and by the Desktop app from the same tree. Every \"pixel\" is a fixed-width Box with a backgroundColor and at most two ASCII characters. There are no fonts, px sizes, shadows or breakpoints; the tokens are hex inks, cell widths in character columns, ASCII glyphs and borderStyle names.",
+    "keyCharacteristics": [
+      "Navy star-tiled ground behind everything; the page never shows bare terminal background.",
+      "A palette of saturated inks on dark ground: pink banner, yellow labels, cyan links, lime dinosaur, orange cacti.",
+      "Every element is a row of fixed-width cells; alignment comes from cell widths and colour, never from padded text.",
+      "The page moves on the game clock: dividers march, stars drift, the record notice blinks, the legs alternate.",
+      "Each state (fresh, running, paused, over, record) reads from colour alone, without reading a sentence."
+    ],
+    "rules": [
+      {
+        "name": "The Lit Number Rule",
+        "body": "In the header the label is yellow and the live score is white: the value that changes every step is always the brightest ink in its row.",
+        "section": "colors"
+      },
+      {
+        "name": "The Crash Ink Rule",
+        "body": "Game over is told by colour before text: the dinosaur's background and the table border both switch from their rest inks to dead. No other state recolours the border.",
+        "section": "colors"
+      },
+      {
+        "name": "The Register Rule",
+        "body": "The palette reads as the 216-colour web-safe register; three inks sit just outside it where the register had no close value (`star`, `starBright`, `bannerDark`). A new ink should read as web-safe to the eye.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Glyph Rule",
+        "body": "A cell carries at most cw ASCII characters and never a leading space. Alignment comes from the Box width and its background, because the Desktop collapses whitespace and widens non-ASCII glyphs.",
+        "section": "typography"
+      }
+    ],
+    "dos": [
+      "Do draw every picture element as a fixed-width Box with a background and at most cw ASCII characters, so the terminal and the Desktop draw the same cells.",
+      "Do keep the page 30 cells wide and size cells by bodyColumns >= 62, so the banner and table stay centred in both widths.",
+      "Do tell state by ink first: cyan for an invitation, yellow for a warning or pause, red for a crash, pink for a record.",
+      "Do put the brackets around links only in the terminal; on the Desktop the hotkey badge is the chrome and a | separates the links.",
+      "Do move only on the clock: dividers, ground, stars, legs and the blink all follow the score, never a timer of their own."
+    ],
+    "donts": [
+      "Don't align with padded text or leading spaces; the Desktop collapses whitespace.",
+      "Don't use non-ASCII or symbol glyphs in cells; the Desktop draws them in a wider face and the picture breaks.",
+      "Don't add an ink that does not read as web-safe; the three off-register inks are the world's own and not a licence for more.",
+      "Don't recolour the table border for any state other than game over.",
+      "Don't carry any of this into another mod; the other games use theme colour keys and their own grammar."
+    ]
+  }
+}
