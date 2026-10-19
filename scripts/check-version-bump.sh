@@ -18,6 +18,10 @@ for name in $changed_mods; do
     echo "mods/$name: new mod, no bump needed"
     continue
   fi
+  if [[ ! -f "$manifest" ]]; then
+    echo "mods/$name: removed, no bump needed"
+    continue
+  fi
   old="$(git show "$base:$manifest" | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).version ?? ''")"
   new="$(node -p "require('./$manifest').version ?? ''")"
   if [[ "$old" == "$new" ]]; then
