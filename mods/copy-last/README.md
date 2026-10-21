@@ -40,7 +40,7 @@ It reads the transcript through the mods API and writes to the clipboard through
 
 ## Tested with
 
-- Claude Code 2.1.306, `claude plugin validate --strict` and `claude plugin test` pass. `/copy-last` answered from a live `claude -p` session.
+- Claude Code 2.1.306, `claude plugin validate --strict` and `claude plugin test` pass. The command answered from a live `claude -p` session before the rename, as `/copy`.
 
 ## Limitations
 
