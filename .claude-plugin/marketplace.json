@@ -56,7 +56,7 @@
     {
       "name": "copy-last",
       "source": "./mods/copy-last",
-      "description": "Copy Claude's last reply, or its last code block, to the clipboard as clean Markdown with /copy, with no terminal indentation or trailing spaces.",
+      "description": "Copy Claude's last reply, or its last code block, to the clipboard as clean Markdown with /copy-last, with no terminal indentation or trailing spaces.",
       "category": "workflow",
       "tags": [
         "clipboard",

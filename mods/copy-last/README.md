@@ -1,6 +1,6 @@
 # copy-last
 
-Copy Claude's last reply, or its last code block, to the clipboard as clean Markdown with `/copy`. Nothing is selected in the terminal, so there's no gutter indentation, no wrapped lines, and no trailing spaces.
+Copy Claude's last reply, or its last code block, to the clipboard as clean Markdown with `/copy-last`. Nothing is selected in the terminal, so there's no gutter indentation, no wrapped lines, and no trailing spaces.
 
 The pain is one of the ten most-reacted open issues on the Claude Code tracker: copy and paste from the terminal includes unwanted indentation and trailing spaces. This reads the reply's source from the transcript instead.
 
@@ -21,9 +21,9 @@ claude --plugin-dir ./mods/copy-last
 
 | Command | What it copies |
 | :-- | :-- |
-| `/copy` | The last reply, as Markdown source. |
-| `/copy code` | The last fenced code block in the last reply, without the fence. Looks back through the last five replies if the latest has none. |
-| `/copy code 2` | The second-to-last code block. |
+| `/copy-last` | The last reply, as Markdown source. |
+| `/copy-last code` | The last fenced code block in the last reply, without the fence. Looks back through the last five replies if the latest has none. |
+| `/copy-last code 2` | The second-to-last code block. |
 
 The command prints what it copied, as a character and line count.
 
@@ -32,7 +32,7 @@ The command prints what it copied, as a character and line count.
 From `claude plugin validate ./mods/copy-last`:
 
 ```text
-hooks: session.start, command.run{command=copy}
+hooks: session.start, command.run{command=copy-last}
 calls: $.command.register, $.session.messages (via lastReplies), $.ui.copy, $.ui.log
 ```
 
@@ -40,7 +40,7 @@ It reads the transcript through the mods API and writes to the clipboard through
 
 ## Tested with
 
-- Claude Code 2.1.295, `claude plugin validate --strict` and `claude plugin test` pass. `/copy` answered from a live `claude -p` session.
+- Claude Code 2.1.306, `claude plugin validate --strict` and `claude plugin test` pass. The command answered from a live `claude -p` session before the rename, as `/copy`.
 
 ## Limitations
 
