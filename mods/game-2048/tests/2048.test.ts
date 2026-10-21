@@ -1,5 +1,5 @@
 import { expect, mock, test } from 'claude-code/testing'
-import { DIRS, GOAL, SIZE, at, canMove, isGame, move, newGame, slide, slideLine, spawn, undo } from '../hooks/game'
+import { DIRS, GOAL, MAX_UNDO, SIZE, at, canMove, isGame, migrate, move, newGame, slide, slideLine, spawn, undo } from '../hooks/game'
 import type { Game } from '../types'
 
 const T0 = 1_700_000_000_000
@@ -47,7 +47,7 @@ test('a spawn is a 2 or a 4 on an empty cell, repeatable from the seed, and skip
   expect(spawn(full, 7, 0)).toEqual(full)
 })
 
-test('a new game has two tiles; a move slides, scores, spawns, and remembers one undo', async () => {
+test('a new game has two tiles; a move slides, scores, spawns, and remembers two undos', async () => {
   const g = newGame(3, STATS)
   expect(g.cells.filter(Boolean).length).toBe(2)
   expect(g.score).toBe(0)
@@ -65,16 +65,51 @@ test('a new game has two tiles; a move slides, scores, spawns, and remembers one
   // Two tiles, maybe merged into one, plus the spawn.
   const count = m.cells.filter(Boolean).length
   expect(count === 2 || count === 3).toBe(true)
-  expect(m.prev?.cells).toEqual(g.cells)
+  expect(m.prev.length).toBe(1)
+  expect(m.prev[0].cells).toEqual(g.cells)
   const back = undo(m).game
   expect(back.cells).toEqual(g.cells)
   expect(back.moves).toBe(0)
-  expect(back.prev).toBeNull()
+  expect(back.prev).toEqual([])
   // Undoing the move that made 2048 takes the win back too.
   const won = move({ ...g, cells: [1024, 1024, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, 'left').game
   expect(won.won).toBe(true)
   expect(undo(won).game.won).toBe(false)
   expect(undo(back).error).toBe('Nothing to take back.')
+  // Three moves keep only the last two to take back, in order; the third undo is refused.
+  expect(MAX_UNDO).toBe(2)
+  const a = move({ ...g, cells: [2, 2, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }, 'left').game
+  const b = move(a, 'down').game
+  const c = move(b, 'right').game
+  expect(c.prev.length).toBe(2)
+  expect(c.prev.map((p) => p.moves)).toEqual([1, 2])
+  const c1 = undo(c).game
+  expect(c1.cells).toEqual(b.cells)
+  expect(c1.score).toBe(b.score)
+  expect(c1.moves).toBe(2)
+  const c2 = undo(c1).game
+  expect(c2.cells).toEqual(a.cells)
+  expect(c2.moves).toBe(1)
+  expect(c2.prev).toEqual([])
+  expect(undo(c2).error).toBe('Nothing to take back.')
+})
+
+test('a game saved by 0.1.x, with one undo or none, is brought up to the list shape', async () => {
+  const g = newGame(5, { games: 4, best: 900, highest: 128 })
+  const snap = { cells: g.cells, score: 0, moves: 0, won: false }
+  const legacyNone = { ...g, prev: null }
+  const legacyOne = { ...g, prev: snap }
+  expect(isGame(legacyNone)).toBe(false)
+  expect(isGame(legacyOne)).toBe(false)
+  expect(migrate(legacyNone)).toEqual({ ...g, prev: [] })
+  expect(migrate(legacyOne)).toEqual({ ...g, prev: [snap] })
+  expect(isGame(migrate(legacyNone))).toBe(true)
+  expect(isGame(migrate(legacyOne))).toBe(true)
+  // The current shape, junk, and nothing all pass through untouched.
+  expect(migrate(g)).toBe(g)
+  expect(migrate({ cells: 'nope' })).toEqual({ cells: 'nope' })
+  expect(migrate(undefined)).toBeUndefined()
+  expect(migrate(null)).toBeNull()
 })
 
 test('a move that changes nothing is refused and spawns nothing', async () => {
@@ -109,8 +144,9 @@ test('the guard rejects a malformed game', async () => {
   const g = newGame(1, STATS)
   expect(isGame(g)).toBe(true)
   expect(isGame({ ...g, cells: g.cells.slice(1) })).toBe(false)
-  expect(isGame({ ...g, prev: { cells: 'x', score: 0, moves: 0, won: false } })).toBe(false)
-  expect(isGame({ ...g, prev: { cells: g.cells, score: 0 } })).toBe(false)
+  expect(isGame({ ...g, prev: [{ cells: 'x', score: 0, moves: 0, won: false }] })).toBe(false)
+  expect(isGame({ ...g, prev: [{ cells: g.cells, score: 0 }] })).toBe(false)
+  expect(isGame({ ...g, prev: { cells: g.cells, score: 0, moves: 0, won: false } })).toBe(false)
   expect(isGame({ ...g, stats: { games: 1 } })).toBe(false)
   expect(isGame(null)).toBe(false)
 })
@@ -161,7 +197,7 @@ test('a game is created and saved at start, and survives /clear', async ($, on) 
   await ui.unmount()
 })
 
-test('the keys slide the board, a slide that changes nothing toasts, undo takes one back, and the how-to hides after the first move', async ($, on) => {
+test('the keys slide the board, a slide that changes nothing toasts, undo takes two back, and the how-to hides after the first move', async ($, on) => {
   const toasts: string[] = []
   const { saved } = stubs(on, { toasts })
   await start($)
@@ -180,13 +216,46 @@ test('the keys slide the board, a slide that changes nothing toasts, undo takes 
   expect(g.cells.filter(Boolean).length).toBe(2)
   expect(await ui.find({ type: 'Text', text: 'How to play' })).toBeUndefined()
   expect(await ui.find({ type: 'Text', text: 'Score 4 · a new best' })).toBeDefined()
+  expect((await ui.find({ key: 'undo' }))?.text).toBe('Undo (1)')
+  await ui.press({ key: 'd' })
+  g = current(saved)
+  expect(g.moves).toBe(2)
+  expect(g.cells[3]).toBe(4)
+  expect((await ui.find({ key: 'undo' }))?.text).toBe('Undo (2)')
+  await ui.press({ key: 'undo' })
+  g = current(saved)
+  expect(g.moves).toBe(1)
+  expect(g.cells[0]).toBe(4)
+  expect(g.score).toBe(4)
+  expect((await ui.find({ key: 'undo' }))?.text).toBe('Undo (1)')
   await ui.press({ key: 'undo' })
   expect(await ui.find({ type: 'Text', text: 'How to play' })).toBeDefined()
   g = current(saved)
   expect(g.cells.slice(0, 2)).toEqual([2, 2])
   expect(g.score).toBe(0)
+  expect(g.moves).toBe(0)
+  expect((await ui.find({ key: 'undo' }))?.text).toBe('Undo')
   await ui.press({ key: 'undo' })
   expect(toasts.pop()).toBe('Nothing to take back.')
+  await ui.unmount()
+})
+
+test('a game saved by 0.1.x loads with its record and its one undo intact', async ($, on) => {
+  const saved = new Map<string, unknown>()
+  const g = newGame(2, { games: 9, best: 5000, highest: 512 })
+  saved.set('game', { ...g, cells: [4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], score: 4, moves: 1, prev: { cells: [2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], score: 0, moves: 0, won: false } })
+  stubs(on, { saved })
+  await start($)
+  let now = current(saved)
+  expect(isGame(now)).toBe(true)
+  expect(now.stats).toEqual({ games: 9, best: 5000, highest: 512 })
+  expect(now.prev.length).toBe(1)
+  const ui = await $.ui.mount(PANE)
+  await ui.press({ key: 'undo' })
+  now = current(saved)
+  expect(now.cells.slice(0, 2)).toEqual([2, 2])
+  expect(now.score).toBe(0)
+  expect(now.prev).toEqual([])
   await ui.unmount()
 })
 

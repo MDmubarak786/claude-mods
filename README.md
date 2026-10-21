@@ -51,7 +51,7 @@ Eight games that open in a pane beside the transcript, so you can play while a l
 | [`bingo`](mods/bingo/) | `/bingo` | 75-ball bingo against Claude |
 | [`xo`](mods/xo/) | `/xo` | Tic-tac-toe, three levels up to perfect |
 | [`connect-four`](mods/connect-four/) | `/connect-four` | Connect Four, three levels |
-| [`game-2048`](mods/game-2048/) | `/2048` | 2048 with one undo and a best score |
+| [`game-2048`](mods/game-2048/) | `/2048` | 2048 with two undos and a best score |
 | [`pairs`](mods/pairs/) | `/pairs` | Memory pairs on a running clock, fewest turns and fastest time kept |
 | [`snake`](mods/snake/) | `/snake` | Snake, steered with w a s d |
 | [`sudoku`](mods/sudoku/) | `/sudoku` | Sudoku with one solution per puzzle, three levels, a clock and hints |
@@ -141,7 +141,7 @@ claude --plugin-dir ./mods/fence
 | :-- | :-- | :-- |
 | [`bingo`](mods/bingo/) | Classic 75-ball bingo, you against Claude. Numbers are called, you mark your card and shout Bingo first; Claude plays a card of its own and claims one call late, so you get a fair window. Zero tokens. | 0.1.1 |
 | [`connect-four`](mods/connect-four/) | Connect Four against Claude, in a pane. Press a column's digit to drop a disc; Claude answers in half a second at three levels, from beatable to a seven-move lookahead. Zero tokens. | 0.1.1 |
-| [`game-2048`](mods/game-2048/) | 2048 in a pane. Slide tiles with w, a, s and d, merge equal numbers, reach 2048. One undo, a best score that survives restarts, and a board that replays from its seed. Zero tokens. | 0.1.1 |
+| [`game-2048`](mods/game-2048/) | 2048 in a pane. Slide tiles with w, a, s and d, merge equal numbers, reach 2048. Two undos, a best score that survives restarts, and a board that replays from its seed. Zero tokens. | 0.2.0 |
 | [`pairs`](mods/pairs/) | Memory pairs in a pane. Sixteen face-down cards, eight matching pairs; press a card's letter to turn it, find its twin, finish in as few turns and as little time as you can. Best of each kept. Zero tokens. | 0.1.1 |
 | [`snake`](mods/snake/) | Snake in a pane. Steer with w, a, s and d, eat the food, don't hit the walls or yourself. Pause with p, pick the speed, high score kept. Zero tokens. | 0.1.0 |
 | [`sudoku`](mods/sudoku/) | Sudoku in a pane. Three levels with one solution each, move with w a s d, type a digit, undo, a hint when stuck, and a clock that pauses when the pane closes. Best time per level kept. Zero tokens. | 0.1.0 |
