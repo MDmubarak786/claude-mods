@@ -1,8 +1,8 @@
 // copy-last: copy Claude's last reply, or its last code block, to the clipboard.
 //
-//   /copy            the last reply, as Markdown source
-//   /copy code       the last fenced code block in the last reply
-//   /copy code 2     the second-to-last code block
+//   /copy-last       the last reply, as Markdown source
+//   /copy-last code  the last fenced code block in the last reply
+//   /copy-last code 2  the second-to-last code block
 //
 // Copying from the terminal picks up gutter indentation and trailing spaces.
 // This reads the reply from the transcript and copies the source text.
@@ -34,21 +34,21 @@ export function register(on) {
   on('session.start', async ($, e, next) => {
     try {
       await $.command.register({
-        name: 'copy',
+        name: 'copy-last',
         description: 'Copy the last reply, or its last code block, as clean text',
         argumentHint: '[code [N]]',
       })
     } catch (error) {
-      $.ui.log('could not register /copy: ' + error)
+      $.ui.log('could not register /copy-last: ' + error)
     }
     return next(e)
   })
 
-  on('command.run', { command: 'copy' }, async ($, e) => {
+  on('command.run', { command: 'copy-last' }, async ($, e) => {
     const args = e.args.trim().split(/\s+/).filter(Boolean)
     const wantCode = args[0] === 'code'
     const nth = wantCode && args[1] ? Number(args[1]) : 1
-    if (wantCode && (!Number.isInteger(nth) || nth < 1)) return { text: 'Usage: /copy, /copy code, or /copy code N' }
+    if (wantCode && (!Number.isInteger(nth) || nth < 1)) return { text: 'Usage: /copy-last, /copy-last code, or /copy-last code N' }
 
     // Look back through a few replies so a block in the previous reply is still reachable.
     const replies = await lastReplies($, wantCode ? 5 : 1)
