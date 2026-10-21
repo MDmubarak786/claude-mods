@@ -94,11 +94,14 @@ export function highestTile(cells: number[]): number {
   return Math.max(0, ...cells)
 }
 
+/** Moves kept for undo; the oldest is dropped past this. */
+export const MAX_UNDO = 2
+
 export function newGame(seed: number, stats: Stats): Game {
   let cells = new Array(SIZE * SIZE).fill(0)
   cells = spawn(cells, seed, 0)
   cells = spawn(cells, seed, 1)
-  return { seed, cells, score: 0, moves: 0, won: false, over: false, prev: null, stats }
+  return { seed, cells, score: 0, moves: 0, won: false, over: false, prev: [], stats }
 }
 
 export type MoveResult = { game: Game; error?: string }
@@ -114,12 +117,26 @@ export function move(g: Game, dir: Dir): MoveResult {
   const highest = highestTile(cells)
   const over = !canMove(cells)
   const stats: Stats = { ...g.stats, best: Math.max(g.stats.best, score), highest: Math.max(g.stats.highest, highest) }
-  return { game: { ...g, cells, score, moves, won: g.won || highest >= GOAL, over, prev: { cells: g.cells, score: g.score, moves: g.moves, won: g.won }, stats } }
+  return { game: { ...g, cells, score, moves, won: g.won || highest >= GOAL, over, prev: [...g.prev, { cells: g.cells, score: g.score, moves: g.moves, won: g.won }].slice(-MAX_UNDO), stats } }
 }
 
 export function undo(g: Game): MoveResult {
-  if (!g.prev) return { game: g, error: 'Nothing to take back.' }
-  return { game: { ...g, cells: g.prev.cells, score: g.prev.score, moves: g.prev.moves, won: g.prev.won, over: false, prev: null } }
+  const last = g.prev[g.prev.length - 1]
+  if (!last) return { game: g, error: 'Nothing to take back.' }
+  return { game: { ...g, cells: last.cells, score: last.score, moves: last.moves, won: last.won, over: false, prev: g.prev.slice(0, -1) } }
+}
+
+/**
+ * Brings a saved game up to the current shape. Games saved before 0.2.0 kept a
+ * single undo in `prev`, as one snapshot or null; now it is a list. Anything
+ * else passes through unchanged for isGame to judge.
+ */
+export function migrate(x: unknown): unknown {
+  if (!x || typeof x !== 'object') return x
+  const g = x as Record<string, unknown>
+  if (g.prev === null) return { ...g, prev: [] }
+  if (!!g.prev && typeof g.prev === 'object' && !Array.isArray(g.prev)) return { ...g, prev: [g.prev] }
+  return x
 }
 
 export function isGame(x: unknown): x is Game {
@@ -127,9 +144,12 @@ export function isGame(x: unknown): x is Game {
   const g = x as Record<string, unknown>
   const board = (c: unknown) => Array.isArray(c) && c.length === SIZE * SIZE && c.every((v) => Number.isInteger(v) && v >= 0)
   const stats = g.stats as Record<string, unknown> | undefined
-  const prev = g.prev as Record<string, unknown> | null | undefined
+  const snapshot = (p: unknown) => {
+    const s = p as Record<string, unknown> | null
+    return !!s && typeof s === 'object' && board(s.cells) && Number.isInteger(s.score) && Number.isInteger(s.moves) && typeof s.won === 'boolean'
+  }
   return typeof g.seed === 'number' && board(g.cells) && Number.isInteger(g.score) && Number.isInteger(g.moves) &&
     typeof g.won === 'boolean' && typeof g.over === 'boolean' &&
-    (prev === null || (!!prev && typeof prev === 'object' && board(prev.cells) && Number.isInteger(prev.score) && Number.isInteger(prev.moves) && typeof prev.won === 'boolean')) &&
+    Array.isArray(g.prev) && g.prev.every(snapshot) &&
     !!stats && typeof stats === 'object' && ['games', 'best', 'highest'].every((k) => Number.isInteger(stats[k]))
 }

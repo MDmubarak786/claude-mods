@@ -1,6 +1,6 @@
 # game-2048
 
-2048 in a pane beside the conversation. Slide the tiles with **w**, **a**, **s** and **d**; two equal tiles that meet merge into one and score; a new tile appears after every move. Make a 2048 tile, then keep going for a higher one. One undo, a best score and highest tile that survive restarts, and a board that replays from its seed.
+2048 in a pane beside the conversation. Slide the tiles with **w**, **a**, **s** and **d**; two equal tiles that meet merge into one and score; a new tile appears after every move. Make a 2048 tile, then keep going for a higher one. Two undos, a best score and highest tile that survive restarts, and a board that replays from its seed.
 
 It's a game you play, not a watcher: it never calls a model, never reads what Claude is doing, and costs no tokens.
 
@@ -27,7 +27,7 @@ Score 1256 · best 4512
 
 w: Up   a: Left   s: Down   d: Right
 
-n: New game   u: Undo   h: Help   Esc closes
+n: New game   u: Undo (2)   h: Help   Esc closes
 ```
 
 The tiles are colored, which the text above can't show. They use the original game's palette, so the board looks the same on any theme: beige empty slots, cream 2s and 4s, orange deepening through 8 to 64, gold from 128 to 2048, and near-black beyond. Each tile is three rows tall with its number centered.
@@ -71,19 +71,19 @@ hooks: session.start, classic.SessionStart{source=clear|resume|fork}, command.ru
 calls: $.clock.now (via load, startNew), $.command.register, $.session.surfaces, $.state.get, $.state.set, $.store.get (via load), $.store.set (via save), $.ui.invalidate, $.ui.log, $.ui.open, $.ui.resolve, $.ui.toast
 ```
 
-- **`$.store`** keeps the board, the score, the one undo, and the record, so a game survives a restart. If the store can't be read at start, the mod plays in memory and writes nothing over the saved record.
+- **`$.store`** keeps the board, the score, the last two moves for undo, and the record, so a game survives a restart. A game saved by 0.1.x, with its single undo, loads as it was. If the store can't be read at start, the mod plays in memory and writes nothing over the saved record.
 - **`$.clock`** seeds each game. There is no timer: nothing happens between your moves.
 - No tool calls are observed, no files, processes, model calls, or network.
 
 ## Tested with
 
-- Claude Code 2.1.295, `claude plugin validate --strict` and `claude plugin test` passing: line sliding and merging, all four directions, seeded spawns, a move that changes nothing, undo, game over on a locked board, the 2048 win that keeps play going, mounted pane tests for the keys, the status lines, the commands, an unreadable store, and a narrow pane.
+- Claude Code 2.1.295, `claude plugin validate --strict` and `claude plugin test` passing: line sliding and merging, all four directions, seeded spawns, a move that changes nothing, two undos and a refused third, a saved game from 0.1.x, game over on a locked board, the 2048 win that keeps play going, mounted pane tests for the keys, the status lines, the commands, an unreadable store, and a narrow pane.
 - Played in the Desktop app, 2.1.293, through hot reloading.
 
 ## Limitations
 
 - One game at a time per machine. Two sessions playing at once overwrite each other; the last write wins.
-- One level of undo, and none after a new game.
+- Two levels of undo, and none after a new game.
 - The arrow keys are not hotkeys a mod can take; the letters w, a, s, d are.
 
 ## License

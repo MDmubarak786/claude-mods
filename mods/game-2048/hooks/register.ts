@@ -5,16 +5,16 @@
 //   /2048 stats      games, best score, highest tile
 //
 // In the pane: w, a, s and d slide the tiles up, left, down and right; u takes
-// the last move back, n starts a new game, h shows the how-to. Nothing here
+// a move back, up to two, n starts a new game, h shows the how-to. Nothing here
 // calls a model, reads what Claude is doing, or leaves the machine.
 
 import { atom, read, update } from 'claude-code'
 import type { Game, Stats } from '../types'
-import { GOAL, SIZE, at, isGame, move, newGame, undo, type Dir } from './game'
+import { GOAL, MAX_UNDO, SIZE, at, isGame, migrate, move, newGame, undo, type Dir } from './game'
 
 const PANE = '2048'
 const EMPTY_STATS: Stats = { games: 0, best: 0, highest: 0 }
-const EMPTY: Game = { seed: 0, cells: [], score: 0, moves: 0, won: false, over: false, prev: null, stats: EMPTY_STATS }
+const EMPTY: Game = { seed: 0, cells: [], score: 0, moves: 0, won: false, over: false, prev: [], stats: EMPTY_STATS }
 const game = atom({ plugin: 'game-2048', key: 'game' } as const, EMPTY)
 
 // The how-to block: shown on a fresh board until h hides it, for the session.
@@ -44,15 +44,20 @@ async function change($, fn: (cur: Game) => Game): Promise<Game> {
 
 async function load($) {
   let saved: unknown = undefined
+  let upgraded = false
   let readable = true
   try {
-    saved = await $.store.get('game')
+    const raw = await $.store.get('game')
+    saved = migrate(raw)
+    upgraded = saved !== raw
   } catch {
     readable = false
   }
   storeOk = readable
   if (isGame(saved)) {
     await update($, game, () => saved as Game)
+    // A game saved in an older shape is written back in the current one.
+    if (upgraded) await save($, saved)
     return
   }
   if (!readable) {
@@ -198,13 +203,13 @@ export function register(on) {
       Text({ bold: true, children: ['How to play'] }),
       Text({ wrap: 'wrap', children: ['1. Press w, a, s or d: every tile slides that way as far as it can.'] }),
       Text({ wrap: 'wrap', children: ['2. Two equal tiles that meet merge into one, and its value is added to your score. A new 2 (or 4) appears after each move.'] }),
-      Text({ wrap: 'wrap', children: ['3. Make a 2048 tile. The game ends when no slide changes the board. u takes one move back.'] }),
+      Text({ wrap: 'wrap', children: ['3. Make a 2048 tile. The game ends when no slide changes the board. u takes a move back, up to ' + MAX_UNDO + '.'] }),
       Text({ dimColor: true, wrap: 'wrap', children: ['Keys need the pane focused: click it if nothing happens. h hides this.'] }),
     ] })
 
     const footer = Box({ flexDirection: 'row', columnGap: 3, flexWrap: 'wrap', children: [
       Button({ key: 'new', label: 'New game', hotkey: 'n', plain: true, onPress: () => startNew($) }),
-      Button({ key: 'undo', label: 'Undo', hotkey: 'u', plain: true, onPress: async () => {
+      Button({ key: 'undo', label: g.prev.length ? 'Undo (' + g.prev.length + ')' : 'Undo', hotkey: 'u', plain: true, onPress: async () => {
         let error: string | undefined
         await change($, (cur) => {
           const r = undo(cur)
