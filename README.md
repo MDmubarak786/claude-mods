@@ -153,6 +153,12 @@ claude --plugin-dir ./mods/fence
 | [`sudoku`](mods/sudoku/) | Sudoku in a pane. Three levels with one solution each, move with w a s d, type a digit, undo, a hint when stuck, and a clock that pauses when the pane closes. Best time per level kept. Zero tokens. | 0.1.0 |
 | [`typing`](mods/typing/) | Typing race in a pane. A line of code appears, you type it; every character colors right or wrong as you go, and Enter scores words per minute and accuracy. Last ten runs and your best kept. Zero tokens. | 0.1.1 |
 | [`xo`](mods/xo/) | Tic-tac-toe against Claude, in a pane. Press a digit to play a square; Claude answers in half a second at three levels, from beatable to perfect. Zero tokens. | 0.1.0 |
+
+### Skills
+
+| Skill | What it does | Version |
+| :-- | :-- | :-- |
+| [`vet-plugin`](skills/vet-plugin/) | Audit a Claude Code plugin, mod, or skill before you install it: what it would do on your machine, what its README doesn't say, and whether to install. | 0.1.0 |
 <!-- mods:end -->
 
 Looking for something that isn't here yet? The [roadmap](docs/roadmap.md) lists mods we'd love to merge, each with the events and API calls that make it work.

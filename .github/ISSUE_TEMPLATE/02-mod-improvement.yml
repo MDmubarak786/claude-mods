@@ -33,6 +33,7 @@ body:
         - trust-but-verify
         - typing
         - undo-agent
+        - vet-plugin
         - watchtower
         - xo
         # mods:end

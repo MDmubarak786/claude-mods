@@ -287,6 +287,18 @@
       ]
     },
     {
+      "name": "vet-plugin",
+      "source": "./skills/vet-plugin",
+      "description": "Audit a Claude Code plugin, mod, or skill before you install it: what it would do on your machine, what its README doesn't say, and whether to install.",
+      "category": "safety",
+      "tags": [
+        "skill",
+        "safety",
+        "plugins",
+        "review"
+      ]
+    },
+    {
       "name": "watchtower",
       "source": "./mods/watchtower",
       "description": "One line above the prompt showing what your guard mods are doing: the fence, pins, the breaker threshold, the test command and its last result, and every call refused this session.",
