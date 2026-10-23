@@ -21,6 +21,7 @@ body:
         - ding
         - fence
         - game-2048
+        - guard-setup
         - mcp-diet
         - memory-lint
         - pairs

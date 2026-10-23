@@ -98,6 +98,18 @@
       ]
     },
     {
+      "name": "guard-setup",
+      "source": "./skills/guard-setup",
+      "description": "Set up the guard mods for this project from its own files: the fence paths, the pins, a .claude/style-cop.md, and the red-green test command, as commands to paste and one file to write.",
+      "category": "safety",
+      "tags": [
+        "skill",
+        "safety",
+        "guards",
+        "setup"
+      ]
+    },
+    {
       "name": "mcp-diet",
       "source": "./mods/mcp-diet",
       "description": "Choose which MCP tools and subagent types Claude sees, per project. A pane lists every server and tool with the size of its description; defer or hide the ones this repo never needs and stop paying for them on every request.",
