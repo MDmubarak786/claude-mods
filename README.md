@@ -5,7 +5,7 @@
 [![Claude Code 2.1.287+](https://img.shields.io/badge/Claude%20Code-2.1.287%2B-d97757.svg)](https://code.claude.com/docs/en/plugins/mods/overview)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**Mods add guards, panes, and games to [Claude Code](https://code.claude.com/docs/en/plugins/mods/overview): small plugins that run inside it and can refuse a risky tool call, draw a pane beside the transcript, or add a `/command`, all installed with two commands.**
+**Mods add guards, panes, and games to [Claude Code](https://code.claude.com/docs/en/plugins/mods/overview): small plugins that run inside it and can refuse a risky tool call, draw a pane beside the transcript, or add a `/command`. [Skills](https://code.claude.com/docs/en/skills) add know-how: a page Claude reads when a task matches it. Both install with two commands.**
 
 ![Claude answers a question on the left while 2048 is played in a pane on the right](docs/media/hero.gif)
 
@@ -76,6 +76,12 @@ Eight games that open in a pane beside the transcript, so you can play while a l
 
 Install one the same way, for example `/plugin install snake@modhub`.
 
+## Skills
+
+A skill is a page of instructions Claude reads when a request matches its description, or when you type `/name:name`. It runs no code in Claude Code's process and grants no permissions: every tool call it leads to still goes through your permission prompts and hooks. What it costs is context, a few hundred tokens in every session for its listing and a few thousand when it runs; each skill's README says how many.
+
+Skills live under [`skills/`](skills/), one plugin each, and install exactly like a mod. The **Skills** table below lists the ones that have shipped; the next ones are on the [roadmap](docs/roadmap.md#skills).
+
 ## Install
 
 Inside a Claude Code session (v2.1.287 or later):
@@ -102,7 +108,7 @@ cd claude-mods
 claude --plugin-dir ./mods/fence
 ```
 
-## Mods
+## Mods and skills
 
 <!-- mods:start -->
 <!-- These tables are generated from .claude-plugin/marketplace.json by scripts/update-readme.mjs. Do not edit by hand. -->
@@ -171,22 +177,32 @@ claude plugin validate ./claude-mods/mods/fence
 
 The `hooks:` line lists the events the mod handles and the `calls:` line lists every mods API method it invokes.
 
-## Contribute a mod
+A skill is different: it is text, so there is nothing to execute, but the text steers what Claude asks to do. Every skill's README has the same **What it touches** block, generated from its `SKILL.md`: who can invoke it, the tools it is granted, the files it bundles, and any shell it runs when loaded. CI checks that block too, and the reviewer reads the whole `SKILL.md`, which is short by rule. A skill that tells Claude to download and run code, send data off the machine, or ignore your instructions is refused; see [SECURITY.md](SECURITY.md).
+
+## Contribute a mod or a skill
 
 ```bash
 scripts/new-mod.sh my-mod "One sentence saying what it does"
 claude --plugin-dir ./mods/my-mod
 ```
 
-That scaffolds a working mod from [`templates/mod`](templates/mod/), registers it in the marketplace, and validates it. [CONTRIBUTING.md](CONTRIBUTING.md) covers the rest: branches, the README template, tests, version bumps, and what has to pass before merge. Questions go to [Discussions](https://github.com/MDmubarak786/claude-mods/discussions); see [SUPPORT.md](SUPPORT.md).
+That scaffolds a working mod from [`templates/mod`](templates/mod/), registers it in the marketplace, and validates it. For a skill:
+
+```bash
+scripts/new-skill.sh my-skill "One sentence saying what it does"
+claude --plugin-dir ./skills/my-skill
+```
+
+[CONTRIBUTING.md](CONTRIBUTING.md) covers the rest: branches, the README template, tests and evals, version bumps, and what has to pass before merge. Questions go to [Discussions](https://github.com/MDmubarak786/claude-mods/discussions); see [SUPPORT.md](SUPPORT.md).
 
 ## Layout
 
 ```text
-.claude-plugin/marketplace.json   The catalog. One entry per mod.
-mods/<name>/                      One complete plugin per directory.
-templates/mod/                    What scripts/new-mod.sh copies.
-scripts/                          new-mod, try, install, validate, ship, and the checks CI runs.
+.claude-plugin/marketplace.json   The catalog. One entry per mod or skill.
+mods/<name>/                      One complete mod per directory: a plugin with a hooks module.
+skills/<name>/                    One complete skill per directory: a plugin with one SKILL.md.
+templates/mod/, templates/skill/  What scripts/new-mod.sh and scripts/new-skill.sh copy.
+scripts/                          new-mod, new-skill, try, install, validate, ship, and the checks CI runs.
 docs/                             Roadmap, review checklist, and the clips to record (docs/media).
 .github/                          CI, labeler, Dependabot, issue forms, PR template, CODEOWNERS.
 ```

@@ -1,0 +1,60 @@
+name: New skill idea
+description: Propose a skill before writing it, so we can say yes early.
+title: "[idea] skill: "
+labels: ["idea", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A skill is a page Claude reads when a task matches its description. Every skill in this repository starts from a task Claude gets wrong or slow without it, checks that no official plugin or built-in skill already covers it, and ships eval cases that show the difference. The [roadmap](https://github.com/MDmubarak786/claude-mods/blob/main/docs/roadmap.md#skills) lists what's planned.
+  - type: input
+    id: name
+    attributes:
+      label: Proposed name
+      description: Lowercase letters, digits, and hyphens. No "claude" or "anthropic", which Claude Code reserves. It's invoked as /name:name.
+      placeholder: my-skill
+    validations:
+      required: true
+  - type: textarea
+    id: task
+    attributes:
+      label: The task Claude gets wrong or slow without it
+      description: What you ask for, and what comes back today, in one or two sentences.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Links to issues, discussions, or posts where developers hit this. Your own experience counts; say how often.
+    validations:
+      required: true
+  - type: textarea
+    id: neighbour
+    attributes:
+      label: Nearest existing skill or plugin
+      description: The closest official plugin, built-in skill, or skill elsewhere, and why it isn't enough. "None" is a fine answer if you looked.
+    validations:
+      required: true
+  - type: textarea
+    id: how
+    attributes:
+      label: What the skill tells Claude to do
+      description: The steps, the tools it needs (read-only unless writing is the point), and what the reply looks like. Rough is fine.
+    validations:
+      required: true
+  - type: textarea
+    id: prompts
+    attributes:
+      label: Prompts
+      description: Two requests, in a user's words, that should invoke it, and one nearby request that must not. These become its eval cases.
+    validations:
+      required: true
+  - type: checkboxes
+    id: policy
+    attributes:
+      label: Policy
+      options:
+        - label: It doesn't tell Claude to download and run code, send data off the machine, or bypass permissions or hooks. If it runs commands, I've named them above.
+          required: true
+        - label: I'd like to write it myself.

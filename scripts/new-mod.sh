@@ -19,8 +19,8 @@ if [[ "$name" == *claude* || "$name" == *anthropic* ]]; then
   echo "error: names containing 'claude' or 'anthropic' are reserved by Claude Code and fail strict validation" >&2
   exit 2
 fi
-if [[ -e "$root/mods/$name" ]]; then
-  echo "error: mods/$name already exists" >&2
+if [[ -e "$root/mods/$name" || -e "$root/skills/$name" ]]; then
+  echo "error: $name already exists under mods/ or skills/" >&2
   exit 2
 fi
 
@@ -39,18 +39,7 @@ find "$root/mods/$name" -type f -exec perl -pi -e '
 ' {} +
 
 # Add the marketplace entry.
-node - "$root/.claude-plugin/marketplace.json" "$name" "$description" <<'NODE'
-const [file, name, description] = process.argv.slice(2)
-const fs = require('node:fs')
-const marketplace = JSON.parse(fs.readFileSync(file, 'utf8'))
-if (marketplace.plugins.some((p) => p.name === name)) {
-  console.error(`error: marketplace already lists ${name}`)
-  process.exit(1)
-}
-marketplace.plugins.push({ name, source: `./mods/${name}`, description, category: 'other', tags: [] })
-marketplace.plugins.sort((a, b) => a.name.localeCompare(b.name))
-fs.writeFileSync(file, JSON.stringify(marketplace, null, 2) + '\n')
-NODE
+node "$root/scripts/lib/add-catalog-entry.mjs" "$name" "./mods/$name" "$description"
 
 node "$root/scripts/update-readme.mjs"
 claude plugin validate "$root/mods/$name"

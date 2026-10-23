@@ -1,0 +1,10 @@
+{
+  "name": "__NAME__",
+  "version": "0.1.0",
+  "description": "__DESCRIPTION__",
+  "author": { "name": "__AUTHOR__" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/skills/__NAME__",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["skill"]
+}

@@ -4,7 +4,7 @@
     "name": "modhub maintainers",
     "url": "https://github.com/MDmubarak786/claude-mods"
   },
-  "description": "Community mods for Claude Code: guards, panes, and commands that run inside Claude Code itself.",
+  "description": "Community mods and skills for Claude Code: guards, panes, commands, and skills that run inside Claude Code itself.",
   "plugins": [
     {
       "name": "big-output",

@@ -30,7 +30,9 @@ bug|d73a4a|A mod does the wrong thing, or nothing
 enhancement|a2eeef|An improvement to an existing mod
 idea|c5def5|A proposal for a new mod
 new-mod|0e8a16|A pull request that adds a mod
+new-skill|0e8a16|A pull request that adds a skill
 mod|bfdadc|Touches a mod under mods/
+skill|bfdadc|Touches a skill under skills/
 documentation|0075ca|READMEs, docs, or templates
 ci|5319e7|Workflows and scripts
 security|b60205|A mod reaches further than it should

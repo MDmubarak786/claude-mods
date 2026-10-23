@@ -13,13 +13,18 @@ const check = process.argv.includes('--check')
 const marketplace = JSON.parse(readFileSync(join(root, '.claude-plugin/marketplace.json'), 'utf8'))
 const entries = marketplace.plugins.slice().sort((a, b) => a.name.localeCompare(b.name))
 
-// --- README tables, one per group. A category no group names, such as new-mod.sh's 'other', lands in the group with no list.
+// --- README tables, one per group. Skills group by where they live, so their category can stay a topic.
+// A category no group names, such as new-mod.sh's 'other', lands in the group with no list.
 const groups = [
   { heading: 'Guards', categories: ['safety'] },
   { heading: 'Workflow and context', categories: null },
   { heading: 'Games', categories: ['fun'] },
+  { heading: 'Skills', sourcePrefix: './skills/', label: 'Skill' },
 ]
-const groupOf = (entry) => groups.find((g) => g.categories?.includes(entry.category)) ?? groups.find((g) => !g.categories)
+const groupOf = (entry) =>
+  groups.find((g) => g.sourcePrefix && entry.source.startsWith(g.sourcePrefix)) ??
+  groups.find((g) => g.categories?.includes(entry.category)) ??
+  groups.find((g) => !g.categories && !g.sourcePrefix)
 const row = (entry) => {
   const dir = entry.source.replace(/^\.\//, '')
   let version = ''
@@ -34,7 +39,7 @@ const row = (entry) => {
 const sections = groups.flatMap((group) => {
   const members = entries.filter((entry) => groupOf(entry) === group)
   if (!members.length) return []
-  return ['', `### ${group.heading}`, '', '| Mod | What it does | Version |', '| :-- | :-- | :-- |', ...members.map(row)]
+  return ['', `### ${group.heading}`, '', `| ${group.label ?? 'Mod'} | What it does | Version |`, '| :-- | :-- | :-- |', ...members.map(row)]
 })
 const table = [
   '<!-- mods:start -->',
@@ -78,4 +83,4 @@ if (check) {
   if (!stale) console.log('README table and issue-form mod lists are up to date')
   process.exit(stale)
 }
-console.log('README table and issue-form mod lists updated (' + entries.length + ' mods)')
+console.log('README table and issue-form mod lists updated (' + entries.length + ' entries)')
