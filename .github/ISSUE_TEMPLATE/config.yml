@@ -9,3 +9,6 @@ contact_links:
   - name: Claude Code mods documentation
     url: https://code.claude.com/docs/en/plugins/mods/overview
     about: How mods work, every event and API method, and how to test one.
+  - name: Claude Code skills documentation
+    url: https://code.claude.com/docs/en/skills
+    about: How skills work, every frontmatter field, and how Claude decides to invoke one.

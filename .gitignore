@@ -1,5 +1,7 @@
 # Claude Code writes generated type declarations beside each mod it loads.
 **/.claude-plugin/types/
+# claude plugin eval writes its results beside a skill's eval cases.
+skills/*/evals/results/
 # Editor and OS noise
 .DS_Store
 .idea/

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Start Claude Code with one or more mods loaded for this session only.
+# Start Claude Code with one or more mods or skills loaded for this session only.
 # Usage: scripts/try.sh <name> [<name>...] [-- extra claude args]
 set -euo pipefail
 
@@ -9,11 +9,14 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --) shift; break ;;
     *)
-      if [[ ! -d "$root/mods/$1" ]]; then
-        echo "error: no such mod: mods/$1" >&2
+      if [[ -d "$root/mods/$1" ]]; then
+        args+=(--plugin-dir "$root/mods/$1")
+      elif [[ -d "$root/skills/$1" ]]; then
+        args+=(--plugin-dir "$root/skills/$1")
+      else
+        echo "error: no such mod or skill: $1" >&2
         exit 2
       fi
-      args+=(--plugin-dir "$root/mods/$1")
       shift
       ;;
   esac

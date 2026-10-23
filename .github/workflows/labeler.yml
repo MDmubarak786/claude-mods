@@ -17,13 +17,16 @@ jobs:
       - uses: actions/labeler@v7
         with:
           sync-labels: false
-      - name: Label pull requests that add a mod
+      - name: Label pull requests that add a mod or a skill
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           PR: ${{ github.event.pull_request.number }}
         run: |
-          added=$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[] | select(.status == "added") | .filename' | grep -E '^mods/[^/]+/\.claude-plugin/plugin\.json$' || true)
-          if [ -n "$added" ]; then
+          added=$(gh api "repos/$REPO/pulls/$PR/files" --paginate --jq '.[] | select(.status == "added") | .filename' | grep -E '^(mods|skills)/[^/]+/\.claude-plugin/plugin\.json$' || true)
+          if grep -q '^mods/' <<<"$added"; then
             gh pr edit "$PR" --repo "$REPO" --add-label new-mod
+          fi
+          if grep -q '^skills/' <<<"$added"; then
+            gh pr edit "$PR" --repo "$REPO" --add-label new-skill
           fi

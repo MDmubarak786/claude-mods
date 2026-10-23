@@ -23,6 +23,16 @@ All five shipped: `connect-four`, `game-2048`, `pairs`, `snake`, `typing`. The s
 
 Each ships as its own pull request with mounted-pane tests on the mock clock and a look on the Desktop app before merge. Variants left out on purpose: timed bingo, 4x4 tic-tac-toe, multiplayer across sessions.
 
+## Skills
+
+A skill is a page Claude reads when a task matches its description: no hooks, no code in Claude Code's process, a few hundred tokens in every session and a few thousand when it runs. They live under `skills/<name>/`, one plugin each, and install like a mod. A skill earns a place here with three things: a task Claude gets wrong or slow without it, the nearest official plugin or built-in skill and why it isn't enough, and the eval cases (a prompt that should invoke it, one that must not) that show the difference.
+
+Planned, in order:
+
+- **`vet-plugin`**: audit any Claude Code plugin before installing it, from a folder or a `name@marketplace` id. For a mod, the `hooks:` and `calls:` lines against its README and the fail-closed rules; for a skill, the tools it grants, the files it bundles, and any text that overrides your instructions; for a hooks plugin, every shell command; for an MCP server, the command and headers. Ends with install or don't, against this repository's review checklist and security policy. Nearest: the ecosystem's static scanner (GitHub only) and the built-in `plugin-authoring` skill (for authors, not installers).
+- **`guard-setup`**: read a repository and draft the per-project setup the guard mods need: a `.claude/style-cop.md`, the `red-green` test command, and the exact `/fence` and `/pin` commands to paste. Says which of the four mods aren't installed. Nearest: `claude-md-management`, which edits `CLAUDE.md`, not mod settings.
+- **`release-notes`** (maybe): draft release notes from the pull requests merged since the last tag. Generic, and dropped if the first two prove the path and the queue is better spent on mods.
+
 ## Retired from this roadmap
 
 - `burn` (cost and cache meter): the ecosystem has more than a dozen. See the [survey](ecosystem.md).

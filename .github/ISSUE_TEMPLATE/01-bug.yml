@@ -1,6 +1,6 @@
-name: Bug in a mod
-description: A mod does the wrong thing, or nothing at all.
-title: "[bug] <mod>: "
+name: Bug in a mod or skill
+description: A mod or skill does the wrong thing, or nothing at all.
+title: "[bug] <name>: "
 labels: ["bug", "needs-triage"]
 body:
   - type: markdown
@@ -10,7 +10,7 @@ body:
   - type: dropdown
     id: mod
     attributes:
-      label: Which mod
+      label: Which mod or skill
       options:
         # mods:start
         - big-output
@@ -45,8 +45,8 @@ body:
   - type: input
     id: mod-version
     attributes:
-      label: Mod version
-      description: Shown in `/plugin` under **Installed**, or in the mod's `plugin.json`.
+      label: Mod or skill version
+      description: Shown in `/plugin` under **Installed**, or in its `plugin.json`.
       placeholder: 0.1.1
     validations:
       required: true

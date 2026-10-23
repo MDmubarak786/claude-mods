@@ -1,5 +1,5 @@
-# Each mod is owned by its author, so they're requested on pull requests that touch it.
-# scripts/new-mod.sh reminds you to add a line here.
+# Each mod or skill is owned by its author, so they're requested on pull requests that touch it.
+# scripts/new-mod.sh and scripts/new-skill.sh remind you to add a line here: /mods/<name>/ or /skills/<name>/.
 *                 @MDmubarak786
 /mods/fence/      @MDmubarak786
 /mods/circuit-breaker/  @MDmubarak786

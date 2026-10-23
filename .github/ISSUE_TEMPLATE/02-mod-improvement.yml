@@ -1,12 +1,12 @@
-name: Improve an existing mod
-description: A change to how a mod in this repository works.
-title: "[improvement] <mod>: "
+name: Improve an existing mod or skill
+description: A change to how a mod or skill in this repository works.
+title: "[improvement] <name>: "
 labels: ["enhancement", "needs-triage"]
 body:
   - type: dropdown
     id: mod
     attributes:
-      label: Which mod
+      label: Which mod or skill
       options:
         # mods:start
         - big-output
