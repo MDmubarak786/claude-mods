@@ -1,0 +1,10 @@
+{
+  "name": "guard-setup",
+  "version": "0.1.0",
+  "description": "Set up the guard mods for this project from its own files: the fence paths, the pins, a .claude/style-cop.md, and the red-green test command, as commands to paste and one file to write.",
+  "author": { "name": "Mohammed Mubarak" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/skills/guard-setup",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["skill"]
+}
