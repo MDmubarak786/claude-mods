@@ -26,6 +26,7 @@ body:
         - red-green
         - right-tool
         - show-paths
+        - skill-diet
         - snake
         - standup
         - style-cop

@@ -204,6 +204,18 @@
       ]
     },
     {
+      "name": "skill-diet",
+      "source": "./skills/skill-diet",
+      "description": "Slim a skill that loads too much: a short SKILL.md that routes to reference files by topic, duplicates removed, every rule kept, and the token cost before and after.",
+      "category": "context",
+      "tags": [
+        "skill",
+        "context",
+        "tokens",
+        "skills"
+      ]
+    },
+    {
       "name": "snake",
       "source": "./mods/snake",
       "description": "Snake in a pane. Steer with w, a, s and d, eat the food, don't hit the walls or yourself. Pause with p, pick the speed, high score kept. Zero tokens.",

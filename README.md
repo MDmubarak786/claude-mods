@@ -159,6 +159,7 @@ claude --plugin-dir ./mods/fence
 | Skill | What it does | Version |
 | :-- | :-- | :-- |
 | [`guard-setup`](skills/guard-setup/) | Set up the guard mods for this project from its own files: the fence paths, the pins, a .claude/style-cop.md, and the red-green test command, as commands to paste and one file to write. | 0.1.0 |
+| [`skill-diet`](skills/skill-diet/) | Slim a skill that loads too much: a short SKILL.md that routes to reference files by topic, duplicates removed, every rule kept, and the token cost before and after. | 0.1.0 |
 | [`vet-plugin`](skills/vet-plugin/) | Audit a Claude Code plugin, mod, or skill before you install it: what it would do on your machine, what its README doesn't say, and whether to install. | 0.1.0 |
 <!-- mods:end -->
 
