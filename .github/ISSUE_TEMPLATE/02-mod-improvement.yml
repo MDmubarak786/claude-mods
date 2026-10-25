@@ -23,6 +23,7 @@ body:
         - pairs
         - pins
         - pkg-guard
+        - plugin-ready
         - red-green
         - right-tool
         - show-paths

@@ -170,6 +170,18 @@
       ]
     },
     {
+      "name": "plugin-ready",
+      "source": "./skills/plugin-ready",
+      "description": "Make a folder of skills installable and updatable with /plugin: a marketplace.json, versions that move when files change, names checked against Claude Code's built-in commands, strict validation, and install lines in the README.",
+      "category": "workflow",
+      "tags": [
+        "skill",
+        "publishing",
+        "plugins",
+        "versioning"
+      ]
+    },
+    {
       "name": "red-green",
       "source": "./mods/red-green",
       "description": "Run the project's tests after any turn that edited files, print pass or fail under Claude's answer, and send the failure back to Claude with one /fix command.",

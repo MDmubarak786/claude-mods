@@ -1,0 +1,10 @@
+{
+  "name": "plugin-ready",
+  "version": "0.1.0",
+  "description": "Make a folder of skills installable and updatable with /plugin: a marketplace.json, versions that move when files change, names checked against Claude Code's built-in commands, strict validation, and install lines in the README.",
+  "author": { "name": "Mohammed Mubarak" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/skills/plugin-ready",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["skill"]
+}
