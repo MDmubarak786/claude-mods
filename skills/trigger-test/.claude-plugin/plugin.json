@@ -1,0 +1,10 @@
+{
+  "name": "trigger-test",
+  "version": "0.1.0",
+  "description": "Find out whether a skill fires when it should and stays quiet when it shouldn't: eval cases in a user's words, run with claude plugin eval, and description edits until both pass.",
+  "author": { "name": "Mohammed Mubarak" },
+  "homepage": "https://github.com/MDmubarak786/claude-mods/tree/main/skills/trigger-test",
+  "repository": "https://github.com/MDmubarak786/claude-mods",
+  "license": "MIT",
+  "keywords": ["skill"]
+}
