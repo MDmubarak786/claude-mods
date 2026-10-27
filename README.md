@@ -161,6 +161,7 @@ claude --plugin-dir ./mods/fence
 | [`guard-setup`](skills/guard-setup/) | Set up the guard mods for this project from its own files: the fence paths, the pins, a .claude/style-cop.md, and the red-green test command, as commands to paste and one file to write. | 0.1.0 |
 | [`plugin-ready`](skills/plugin-ready/) | Make a folder of skills installable and updatable with /plugin: a marketplace.json, versions that move when files change, names checked against Claude Code's built-in commands, strict validation, and install lines in the README. | 0.1.0 |
 | [`skill-diet`](skills/skill-diet/) | Slim a skill that loads too much: a short SKILL.md that routes to reference files by topic, duplicates removed, every rule kept, and the token cost before and after. | 0.1.0 |
+| [`trigger-test`](skills/trigger-test/) | Find out whether a skill fires when it should and stays quiet when it shouldn't: eval cases in a user's words, run with claude plugin eval, and description edits until both pass. | 0.1.0 |
 | [`vet-plugin`](skills/vet-plugin/) | Audit a Claude Code plugin, mod, or skill before you install it: what it would do on your machine, what its README doesn't say, and whether to install. | 0.1.0 |
 <!-- mods:end -->
 

@@ -275,6 +275,18 @@
       ]
     },
     {
+      "name": "trigger-test",
+      "source": "./skills/trigger-test",
+      "description": "Find out whether a skill fires when it should and stays quiet when it shouldn't: eval cases in a user's words, run with claude plugin eval, and description edits until both pass.",
+      "category": "workflow",
+      "tags": [
+        "skill",
+        "evals",
+        "skills",
+        "testing"
+      ]
+    },
+    {
       "name": "tripwire",
       "source": "./mods/tripwire",
       "description": "Stop secrets leaving the machine. Holds an edit or command that writes an API key, a private key, or a credential literal, a command that reads a secret file and talks to the network, and a git commit whose staged changes contain a secret. Refuses by default.",
